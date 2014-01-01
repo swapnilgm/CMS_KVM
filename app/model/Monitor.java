@@ -19,27 +19,29 @@ public class Monitor {
 	    ArrayList<String> hostURIList = new ArrayList<String>() ;
 	    String hostName;
 	    
-	    for (int i=1;i<100;i++){
+	    for (int i=82;i<100;i++){
+
 	    	hostName=subnet + "." + i; 	 
 	        try {
 				if (InetAddress.getByName(hostName).isReachable(timeout)){
 					
 					hostName="qemu+tcp://"+subnet + "." + i + "/system";
 					ConnectAuth ca= new ConnectAuthDefault();
-				    conn=new Connect(hostName,ca,0); //connecting to hypervisor
-				    
+				    conn=new Connect(hostName,ca,0); //connecting to hypervisor		    
 			  		    
 				    if (conn.isConnected()){
 				    	hostURIList.add(conn.getHostName());	                	                        	  
 				    }
 				    conn.close();
 				}
-				
-			} catch (IOException | LibvirtException e) {
-				// TODO Auto-generated catch block
+			
+			}
+	        
+	        catch (IOException | LibvirtException e) {
 				e.printStackTrace();
 			}
 	    }
+	    
 		return hostURIList;
 	}        
 	 
