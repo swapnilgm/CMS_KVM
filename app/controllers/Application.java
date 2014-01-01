@@ -13,10 +13,11 @@ public class Application extends Controller {
          return ok(index.render("Home"));
         }
         
-        public static Result hostList()
-        {
+        public static Result hostList() {
+        	
         	ArrayList<String> hostURIList = Monitor.getHostList("192.168.43");
-        	return TODO;        	
+        	return ok(hostlist.render(hostURIList));   	
+        
         }
         
         public static Result staticList(String hostURI,int filter) {
@@ -39,6 +40,7 @@ public class Application extends Controller {
         
         }
         
+       
         public static Result refresh(String hostURI, int filter) throws LibvirtException {
                 return redirect(routes.Application.staticList(hostURI,filter));
         }

@@ -17,24 +17,25 @@ public class Monitor {
 	    ArrayList<String> hostURIList = new ArrayList<String>() ;
 	    String hostName;
 	    
-	    for (int i=1;i<254;i++){
+	    for (int i=82;i<100;i++){
 	    	hostName=subnet + "." + i; 	 
 	        try {
 				if (InetAddress.getByName(hostName).isReachable(timeout)){
 					
 					hostName="qemu+tcp://"+subnet + "." + i + "/system";
 					
-				    conn=new Connect(hostName,true); //connecting to hypervisor
-				    if (conn.isConnected()){
+				   // conn=new Connect(hostName,true); //connecting to hypervisor
+				   // if (conn.isConnected()){
 				    	hostURIList.add(hostName);	                	                        	  
 				    }
-				    conn.close();
-				}
-			} catch (IOException | LibvirtException e) {
+				   // conn.close();
+			}
+		catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-	    }
+		}
+	}
+	    
 		return hostURIList;
 	}        
 	 
