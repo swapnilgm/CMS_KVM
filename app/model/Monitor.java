@@ -2,11 +2,13 @@ package model;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import org.libvirt.Connect;
+import org.libvirt.ConnectAuth;
+import org.libvirt.ConnectAuthDefault;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
+import org.libvirt.ConnectAuth.Credential;
 
 public class Monitor {
 	
@@ -17,19 +19,22 @@ public class Monitor {
 	    ArrayList<String> hostURIList = new ArrayList<String>() ;
 	    String hostName;
 	    
-	    for (int i=1;i<254;i++){
+	    for (int i=1;i<100;i++){
 	    	hostName=subnet + "." + i; 	 
 	        try {
 				if (InetAddress.getByName(hostName).isReachable(timeout)){
 					
 					hostName="qemu+tcp://"+subnet + "." + i + "/system";
-					
-				    conn=new Connect(hostName,true); //connecting to hypervisor
+					ConnectAuth ca= new ConnectAuthDefault();
+				    conn=new Connect(hostName,ca,0); //connecting to hypervisor
+				    
+			  		    
 				    if (conn.isConnected()){
-				    	hostURIList.add(hostName);	                	                        	  
+				    	hostURIList.add(conn.getHostName());	                	                        	  
 				    }
 				    conn.close();
 				}
+				
 			} catch (IOException | LibvirtException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -39,10 +44,10 @@ public class Monitor {
 	}        
 	 
 	public static ArrayList<Domain> staticListVM(String hostURI, int filter) {
-	
+		ArrayList<Domain> vmList=new ArrayList<Domain>();
 		try{
-			conn=new Connect(hostURI,true); //connecting to hypervisor
-	        ArrayList<Domain> vmList=new ArrayList<Domain>();
+			ConnectAuth ca = new ConnectAuthDefault();
+			conn=new Connect(hostURI,ca,0); //connecting to hypervisor	        
 	                       
 	        if(filter == 1) {
 	        	int[] activeVMs = conn.listDomains();
