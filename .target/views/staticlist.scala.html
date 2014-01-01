@@ -4,6 +4,7 @@
         <thead>
                 <tr>
                         <td>Name</td>
+                        <td>OS type</td>
                         <td>Memory</td>
                         <td>Vcpus</td>
                 </tr>
@@ -12,8 +13,9 @@
                 @for(domain <- domains){
                 <tr>
                         <td>@(domain.getName())</td>
+                        <td>@(domain.getOSType())</td>
                         <td>@(domain.getMaxMemory())</td>
-                        <td>@(domain.getMaxVcpus())</td>
+                        <td>@(domain.getInfo().nrVirtCpu)</td>
                 </tr>}
         </tbody>
 </table>
