@@ -3,12 +3,7 @@ package model;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import org.libvirt.Connect;
-import org.libvirt.ConnectAuth;
-import org.libvirt.ConnectAuthDefault;
-import org.libvirt.Domain;
-import org.libvirt.LibvirtException;
-import org.libvirt.ConnectAuth.Credential;
+import org.libvirt.*;
 
 public class Monitor {
 	
@@ -49,9 +44,14 @@ public class Monitor {
 	public static ArrayList<Domain> staticListVM(String hostURI, int filter) {
 		ArrayList<Domain> vmList=new ArrayList<Domain>();
 		try{
+			if(hostURI.compareTo("qemu:///system")!=0)
+			{
+				hostURI="qemu+tcp://" + hostURI + "/system";
+			}
 			ConnectAuth ca = new ConnectAuthDefault();
 			conn=new Connect(hostURI,ca,0); //connecting to hypervisor	        
-	                       
+			
+	
 	        if(filter == 1) {
 	        	int[] activeVMs = conn.listDomains();
 	            for(int i = 0; i < conn.numOfDomains(); i++) 
