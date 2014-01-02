@@ -27,20 +27,21 @@ public class Monitor {
 					
 					hostName="qemu+tcp://"+subnet + "." + i + "/system";
 					ConnectAuth ca= new ConnectAuthDefault();
-				    conn=new Connect(hostName,ca,0); //connecting to hypervisor
-				    
+				    conn=new Connect(hostName,ca,0); //connecting to hypervisor		    
 			  		    
 				    if (conn.isConnected()){
 				    	hostURIList.add(conn.getHostName());	                	                        	  
 				    }
 				    conn.close();
 				}
-				
-			} catch (IOException | LibvirtException e) {
-				// TODO Auto-generated catch block
+			
+			}
+	        
+	        catch (IOException | LibvirtException e) {
 				e.printStackTrace();
-		}
-	}
+
+			}
+	    }
 	    
 		return hostURIList;
 	}        
