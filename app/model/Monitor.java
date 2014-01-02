@@ -20,7 +20,7 @@ public class Monitor {
 	    String hostName;
 	    
 
-	    for (int i=82;i<100;i++){
+	    for (int i=82;i<144;i++){
 	    	hostName=subnet + "." + i; 	 
 	        try {
 				if (InetAddress.getByName(hostName).isReachable(timeout)){

@@ -6,7 +6,7 @@
 GET     /                           controllers.Application.index()
 GET     /list/static/:hostURI    	controllers.Application.staticList(hostURI : String ,filter : Int)
 #GET     /list/dynamic/:hostURI      controllers.Application.dynamicList(hostURI : String)
-GET		/list/host/					controllers.Application.hostList()
+GET		/list/host					controllers.Application.hostList()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
