@@ -20,35 +20,46 @@ public class Application extends Controller {
         public static Result getHostList() {
         	
         	//ArrayList<String> hostURIList = Monitor.getHostList("192.168.43");
+    		if (hostList==null) {
+    			
+    			hostList=Monitor.getHostList("192.168.43");	//later to add in init method for server        			
+    		}
+    
         	return ok(hostlist.render(hostList));   	
         
         }
         
-        public static Result getStaticListALL(int filter) {
-        	ArrayList<Domain> allVMList = new ArrayList<Domain>();
-        	ArrayList<Domain> tempVMList;
-        	if (hostList==null)
-        		return ok("connection lost all");
-        	for(String hostURI : hostList)
-        	{	
-        		
-        		tempVMList=Monitor.staticListVM(hostURI, filter);
-        		if(tempVMList == null)
-        			continue;
-        		for(Domain vm : tempVMList)
-        			allVMList.add(vm);
-        		
-        	}  
-            return ok(staticlist.render(allVMList));
         
-        }
         public static Result getStaticList(String hostURI,int filter) {
-        	              
-            ArrayList<Domain> vm = Monitor.staticListVM(hostURI, filter);
-        	if(vm == null)
-        		return ok("Connection Lost");
-               
-            return ok(staticlist.render(vm));
+        	
+        	ArrayList<Domain> vmList = new ArrayList<Domain>();
+           	ArrayList<Domain> tempList;
+        	
+        	if(hostURI == "all") {
+        		       	
+        		if (hostList==null) {
+        			
+        			hostList=Monitor.getHostList("192.168.43");	//later to add in init method for server        			
+        		}
+        		
+        		for(String hostURI : hostList)
+        		{        		
+        			tempList=Monitor.staticListVM(hostURI, filter);
+        			if(tempList == null)
+        				continue;
+        			for(Domain vm : tempList)
+        				vmList.add(vm);        		
+        		}
+        	}
+        	else {
+        			
+        		vmList=Monitor.staticListVM(hostURI, filter);
+        		
+            	if(vmList == null)
+            		return ok("Unable to connect to host.");				
+			}     		
+        		               
+            return ok(staticlist.render(vmList));
         
         }
         

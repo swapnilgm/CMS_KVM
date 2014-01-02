@@ -3,12 +3,7 @@ package model;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import org.libvirt.Connect;
-import org.libvirt.ConnectAuth;
-import org.libvirt.ConnectAuthDefault;
-import org.libvirt.Domain;
-import org.libvirt.LibvirtException;
-import org.libvirt.ConnectAuth.Credential;
+import org.libvirt.*;
 
 public class Monitor {
 	
