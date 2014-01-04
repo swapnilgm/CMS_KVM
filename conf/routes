@@ -4,8 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET     /list/static/all	    	controllers.Application.getStaticListALL(filter : Int)
-GET     /list/static/:hostURI    	controllers.Application.getStaticList(hostURI : String ,filter : Int )
+GET     /list/static    	controllers.Application.getStaticList(hostURI : String,filter : Int )
 #GET     /list/dynamic/:hostURI      controllers.Application.getDynamicList(hostURI : String)
 GET		/list/host					controllers.Application.getHostList()
 

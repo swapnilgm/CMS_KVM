@@ -14,7 +14,7 @@ public class Application extends Controller {
         public static Result index() {
         
         	hostList=Monitor.getHostList("192.168.43");	//later to add in init method for server       
-        	return ok(hostlist.render(hostList));
+        	return ok(index.render(""));
         }
         
         public static Result getHostList() {
@@ -29,34 +29,47 @@ public class Application extends Controller {
         
         }
         
-        
+      
         public static Result getStaticList(String hostURI,int filter) {
         	
         	ArrayList<Domain> vmList = new ArrayList<Domain>();
            	ArrayList<Domain> tempList;
         	
-        	if(hostURI == "all") {
+        	if(hostURI.compareToIgnoreCase("all")==0) 
+        	{
         		       	
         		if (hostList==null) {
         			
         			hostList=Monitor.getHostList("192.168.43");	//later to add in init method for server        			
         		}
         		
-        		for(String hostURI : hostList)
+        		for(String host : hostList)
         		{        		
-        			tempList=Monitor.staticListVM(hostURI, filter);
-        			if(tempList == null)
+        			tempList=Monitor.staticListVM(host, filter);
+        			if(tempList == null) {        			      			
         				continue;
+        			}
         			for(Domain vm : tempList)
-        				vmList.add(vm);        		
+        			{
+        				vmList.add(vm);  
+        			}
         		}
+        		tempList=Monitor.staticListVM("qemu:///system", filter);
+    			if(tempList != null) {        			      			
+    				for(Domain vm : tempList)
+    				{
+    					vmList.add(vm);        		
+    				}
+    			}
         	}
         	else {
         			
         		vmList=Monitor.staticListVM(hostURI, filter);
         		
             	if(vmList == null)
+            	{
             		return ok("Unable to connect to host.");				
+            	}
 			}     		
         		               
             return ok(staticlist.render(vmList));

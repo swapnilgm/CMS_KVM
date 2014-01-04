@@ -14,8 +14,8 @@ public class Monitor {
 	    ArrayList<String> hostURIList = new ArrayList<String>() ;
 	    String hostName;
 	    
-	    for (int i=82;i<100;i++){
 
+	    for (int i=82;i<144;i++){
 	    	hostName=subnet + "." + i; 	 
 	        try {
 				if (InetAddress.getByName(hostName).isReachable(timeout)){
@@ -34,6 +34,7 @@ public class Monitor {
 	        
 	        catch (IOException | LibvirtException e) {
 				e.printStackTrace();
+
 			}
 	    }
 	    
@@ -43,9 +44,14 @@ public class Monitor {
 	public static ArrayList<Domain> staticListVM(String hostURI, int filter) {
 		ArrayList<Domain> vmList=new ArrayList<Domain>();
 		try{
+			if(hostURI.compareTo("qemu:///system")!=0)
+			{
+				hostURI="qemu+tcp://" + hostURI + "/system";
+			}
 			ConnectAuth ca = new ConnectAuthDefault();
 			conn=new Connect(hostURI,ca,0); //connecting to hypervisor	        
-	                       
+			
+	
 	        if(filter == 1) {
 	        	int[] activeVMs = conn.listDomains();
 	            for(int i = 0; i < conn.numOfDomains(); i++) 
