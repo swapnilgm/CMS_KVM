@@ -4,9 +4,24 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET     /list/static    	controllers.Application.getStaticList(hostURI : String,filter : Int )
-#GET     /list/dynamic/:hostURI      controllers.Application.getDynamicList(hostURI : String)
+
+
+GET     /list/static/:hostName    	controllers.Application.getStaticList(hostName : String, filter : Int )
+#param hostName ---all >lis all   --other-> host specific list
+#
+#
+#
+#GET     /list/dynamic/:hostName      controllers.Application.getDynamicList(hostName : String)
 GET		/list/host					controllers.Application.getHostList()
 
+GET	 /list/dynamic/start		controllers.VMOperation.start(vmName : String, hostName : String)
+GET	 /list/dynamic/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
+GET	 /list/dynamic/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
+GET	 /list/dynamic/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
+GET	 /list/dynamic/resume	controllers.VMOperation.resume(vmName : String, hostName : String)
+GET	 /list/dynamic/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
+
+POST  /create/:hostName			controllers.Application.createVM(hostName : String)
+POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,11 +1,10 @@
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.net.UnknownHostException;
+import java.sql.*;
 import java.io.*;
 
 import javax.sql.DataSource;
-
-import model.Monitor;
+import model.Host;
 
 import play.Application;
 import play.GlobalSettings;
@@ -15,19 +14,28 @@ import play.db.*;
 public class Global extends GlobalSettings {
 	
     public void onStart(Application app) {
-    	loadHost();
-    	//get subnet 
+    	initDB();
+    	  	//get subnet 
     	BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
     	System.out.println("Enter subnet /24 :");
 	    try {
 			String subnet = bufferRead.readLine();
-			Monitor.loadHostList(subnet);
+			System.out.println(subnet);
+			Host.loadHostList("192.168.43");
+		}catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			//
+			//e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
-    private void loadHost() {
+    
+    private void initDB() {
     	//create tables
     	DataSource ds = DB.getDataSource();
     	Connection dbConn=null;
@@ -40,17 +48,17 @@ public class Global extends GlobalSettings {
 		    String sql="CREATE TABLE IF NOT EXISTS Host " +
 	                "(hostIP VARCHAR(255), " + 
 	                " hostName VARCHAR(255) NOT NULL, " + 
-	                " PRIMARY KEY ( ip ))"; 
-	    	if((stmt.executeUpdate(sql))<0)
+	                " PRIMARY KEY ( hostIP ))"; 
+	    	stmt.executeUpdate(sql);
 	    		System.out.println("Created host table in given database...");
-	    	String sql="CREATE TABLE IF NOT EXISTS VM " +
-	                "(hostIP VARCHAR(255), " + 
-	                " vm VARCHAR(255), " + 
+	   /* 	sql = "CREATE TABLE IF NOT EXISTS SavedImage " +
+	                "(uuid VARCHAR(255), " + 
+	                " path VARCHAR(255), " + 
 	                " PRIMARY KEY(vm),"+
 	                "foreign key(hostIP) references host(hostIP))"; 
 	    	if((stmt.executeUpdate(sql))<0)
 	    		System.out.println("Created domain table in given database...");
-	    		    	
+	   */ 		    	
 	    	stmt.close();
 	    	dbConn.close();
 	    			    
@@ -60,5 +68,4 @@ public class Global extends GlobalSettings {
 			e.printStackTrace();
 		}
     }
-
 }
