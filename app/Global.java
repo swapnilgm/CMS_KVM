@@ -16,20 +16,21 @@ public class Global extends GlobalSettings {
     public void onStart(Application app) {
     	initDB();
     	  	//get subnet 
-    	BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-    	System.out.println("Enter subnet /24 :");
+    	//BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+    	//System.out.println("Enter subnet /24 :");
 	    try {
-			String subnet = bufferRead.readLine();
-			System.out.println(subnet);
+			//String subnet = bufferRead.readLine();
+			//System.out.println(subnet);
 			Host.loadHostList("192.168.43");
-		}catch (UnknownHostException e1) {
+		}//catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			//
 			//e1.printStackTrace();
-		} catch (IOException e1) {
+		//} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SQLException e) {
+			//e1.printStackTrace();
+		//} 
+    catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

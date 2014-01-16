@@ -9,6 +9,7 @@ import model.Host;
 import play.db.DB;
 import play.libs.Json;
 import play.mvc.*;
+import views.html.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class Application extends Controller {
 				return TODO;
 			}	//later to add in init method for server       
       */
-        	return ok("");
+        	return ok(index.render(""));
         }
         
         public static Result getHostList()  {

@@ -71,18 +71,20 @@ public class Host {
 	    dbConn=ds.getConnection();
     	stmt=dbConn.createStatement();
     	
-	    for (int i=82;i<144;i++){
+	    for (int i=140;i<144;i++){
 	    	hostIP=subnet + "." + i; 	 
 	        try {
+	        	System.out.println(hostIP);
 				if (InetAddress.getByName(hostIP).isReachable(timeout)){
 				
 						String hostURI="qemu+tcp://"+subnet + "." + i + "/system";
 						ConnectAuth ca= new ConnectAuthDefault();
 					    conn=new Connect(hostURI,ca,0); //connecting to hypervisor		    
-				  		    
+					    System.out.println(hostURI);  		    
 					    if (conn.isConnected()){
+				
 					    	if(stmt.executeUpdate("INSERT INTO Host VALUES('"+hostIP+"','"+conn.getHostName()+"')")>0);
-					    		System.out.println("row added to table");
+					    		System.out.println(subnet+"."+ i+"row added to table");
 					   // 	hostURIList.add(conn.getHostName());	                	                        	  
 					    }
 					    conn.close();

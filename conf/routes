@@ -14,11 +14,19 @@ GET     /list/static/:hostName    	controllers.Application.getStaticList(hostNam
 #GET     /list/dynamic/:hostName      controllers.Application.getDynamicList(hostName : String)
 GET		/list/host					controllers.Application.getHostList()
 
+#start vm
 GET	 /list/dynamic/start		controllers.VMOperation.start(vmName : String, hostName : String)
+#send shutdown signal to vm
 GET	 /list/dynamic/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
+#host summary
+GET  /hostinfo/:hostName		controllers.Application.hostInfo(hostName : String)
+#reboot host
 GET	 /list/dynamic/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
+#pause vm
 GET	 /list/dynamic/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
+#resume vm
 GET	 /list/dynamic/resume	controllers.VMOperation.resume(vmName : String, hostName : String)
+#power off signal
 GET	 /list/dynamic/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
 
 POST  /create/:hostName			controllers.Application.createVM(hostName : String)
