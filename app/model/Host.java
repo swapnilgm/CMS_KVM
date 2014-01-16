@@ -1,7 +1,5 @@
 package model;
 	
-import java.io.IOException;
-import java.net.*;
 import java.sql.*;
 import java.util.ArrayList;
 import javax.sql.DataSource;
@@ -28,18 +26,17 @@ public class Host {
 		try {
 			dbConn =ds.getConnection();
 			stmt=dbConn.createStatement();
+			
 			String query="SELECT hostIP FROM Host WHERE hostName = '"+ hostName+"'";
 			rs = stmt.executeQuery(query);
 			if(rs.next()){
 				hostIP=rs.getString("hostIP");
 			}
-	  	  	stmt.close();
-	  	  	dbConn.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			stmt.close();
+			dbConn.close();
+		} catch(SQLException e){
+			System.err.println(e.getMessage());
 		}
-		
       ConnectAuth ca= new ConnectAuthDefault();
       System.out.println("qemu+tcp://" + hostIP + "/system");
       conn=new Connect("qemu+tcp://" + hostIP + "/system",ca,0); //connecting to hypervisor 
@@ -61,43 +58,6 @@ public class Host {
 		  	return hostList;
 	}
 	
-	public static void loadHostList(String subnet) throws SQLException  {
-		//to probe the network and load list of hodt with hyperviso in database.
-		int timeout=1000;
-		
-	//    ArrayList<String> hostURIList = new ArrayList<String>() ;
-	    String hostIP;
-	    Connect conn;
-	    dbConn=ds.getConnection();
-    	stmt=dbConn.createStatement();
-    	
-	    for (int i=82;i<144;i++){
-	    	hostIP=subnet + "." + i; 	 
-	        try {
-				if (InetAddress.getByName(hostIP).isReachable(timeout)){
-				
-						String hostURI="qemu+tcp://"+subnet + "." + i + "/system";
-						ConnectAuth ca= new ConnectAuthDefault();
-					    conn=new Connect(hostURI,ca,0); //connecting to hypervisor		    
-				  		    
-					    if (conn.isConnected()){
-					    	if(stmt.executeUpdate("INSERT INTO Host VALUES('"+hostIP+"','"+conn.getHostName()+"')")>0);
-					    		System.out.println("row added to table");
-					   // 	hostURIList.add(conn.getHostName());	                	                        	  
-					    }
-					    conn.close();
-				}
-			} catch ( IOException | LibvirtException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	        
-			        
-	     }
-	    stmt.close();
-	    dbConn.close();
-	    
-		//return hostURIList;
-	}
 	
     public int create(JsonNode json)  
     {

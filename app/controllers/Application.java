@@ -2,6 +2,7 @@ package controllers;
 
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -23,17 +24,6 @@ public class Application extends Controller {
 		static Statement stmt=null;
 		
         public static Result index()  {
-    /*    
-        	try {
-				hostList=Monitor.getHostList("192.168.43");
-				return ok(index.render(""));
-			}         	
-        	catch (IOException | LibvirtException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return TODO;
-			}	//later to add in init method for server       
-      */
         	return ok("");
         }
         
@@ -48,7 +38,7 @@ public class Application extends Controller {
         	} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return internalServerError("Oops");
+				return internalServerError("Oops database connection error");
 			}	 
         }
         
@@ -99,7 +89,7 @@ public class Application extends Controller {
     			} catch (LibvirtException e) {
     				// TODO Auto-generated catch block
     				e.printStackTrace();
-    				return notFound();
+    				return internalServerError("Oops, Connection to Host is lost");
     			}       	
             }        
         public static Result createVM(String hostName){
@@ -110,7 +100,7 @@ public class Application extends Controller {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return notFound("Cannot create Host connection");
-			}
+			} 
         	JsonNode json=request().body().asJson();
         	if(json == null) {
         		  return badRequest("Expecting Json data");
@@ -166,8 +156,8 @@ public class Application extends Controller {
 					} catch (LibvirtException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						return notFound();
-					}
+						return notFound("Oops, Connection to Host is lost");
+					} 
             		  		
           	}
         

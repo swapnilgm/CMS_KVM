@@ -1,17 +1,14 @@
 package controllers;
 
 import org.libvirt.*;
-
 import model.Host;
 import play.mvc.*;
 
 public class VMOperation extends Controller{
 	
-        public static Result create(String name, int vcpu, float ram, float mem, int boot_type, String hostname){
-        	return TODO;        
-        }
+       
         
-        public static Result shutdown(String vmName, String hostName) throws LibvirtException {
+        public static Result shutdown(String vmName, String hostName) {
         	try {
         		Host tempHost=new Host(hostName);
 				tempHost.conn.domainLookupByName(vmName).shutdown();
@@ -19,9 +16,8 @@ public class VMOperation extends Controller{
 			} catch (LibvirtException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return internalServerError("Oops unable to shutdown");
+				return notFound("Oops, Connection to Host is lost");
 			}       	
-        	        	
         }        
       
 //for following op check for the flags
@@ -39,6 +35,18 @@ public class VMOperation extends Controller{
         	
         }        
          
+        public static Result delete(String vmName, String hostName) {
+        	try {
+        		Host tempHost=new Host(hostName);
+				tempHost.conn.domainLookupByName(vmName).undefine(3);
+				return ok("deleted");
+			} catch (LibvirtException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return internalServerError("Oops unable to Delete");
+			}       	
+        	
+        }     
         public static Result start(String vmName, String hostName) {
         	try {
         		Host tempHost=new Host(hostName);
