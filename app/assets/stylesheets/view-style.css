@@ -1,0 +1,71 @@
+@import url("colors.css");
+@import url("pure-min.css");
+@import url("Font-Awesome/css/font-awesome.css");
+
+#top-bar {
+    display: inline-block;
+    background-color: silver;
+    width: 100%;
+}
+
+#content {
+   display: inline-block;
+    margin-top: 40px;
+    width: 100%;
+}
+
+#sidebar {
+    width: 200px;
+    height: 400px;
+    float:left;
+    display: inline-block;
+}
+
+#navbar {
+    float: right;
+    width: auto;
+    background-color: inherit;
+    padding: 10px;
+}
+
+#logo {
+    background-color: silver;
+    margin-left: 10px;
+    padding: 10px;
+}
+
+#logo:hover {
+    cursor: pointer;
+}
+
+#inner-content {
+    background-color: silver;
+    width: 1000px;
+    height: 400px;
+    float: right;
+}
+
+#tab-bar {
+    width: inherit;
+}
+
+#button-bar {
+    width: inherit;
+}
+
+#git {
+    padding: 13px;
+    color: rgba( 20, 20, 20, 0.8);
+    vertical-align: top;
+}
+
+#git:hover {
+    color: #39bbbb;
+}
+
+#red {
+    color: red;
+}
+
+body {
+    margin: 20px 30px;

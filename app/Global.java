@@ -50,7 +50,6 @@ public class Global extends GlobalSettings {
     			
     				for (int i=82;i<144;i++) {
     					hostIP=subnet + "." + i; 	 
-    					System.out.println(hostIP);
     					try {
     						if (InetAddress.getByName(hostIP).isReachable(timeout)){
     							String hostURI="qemu+tcp://"+hostIP+ "/system";
@@ -60,7 +59,6 @@ public class Global extends GlobalSettings {
     							if (conn.isConnected()){
     								rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
     								while (rs.next()) {
-    									System.out.println(rs.getInt("total"));
     									if(rs.getInt("total")==0){
     										pstmt.setString(1, hostIP);
     										pstmt.setString(2, conn.getHostName());

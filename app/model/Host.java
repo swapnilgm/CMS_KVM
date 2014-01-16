@@ -58,7 +58,6 @@ public class Host {
 		  	return hostList;
 	}
 	
-	
     public int create(JsonNode json)  
     {
     	//String shortdesc="creating with test aspp";
@@ -142,7 +141,7 @@ public class Host {
 	    	}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 			return -1;
 		}
         
@@ -174,8 +173,13 @@ public class Host {
 	  	Host tempHost;
 	  	while (rs.next())
 		{
-	  		tempHost=new Host(rs.getString("hostName"));
-			vmList.addAll(tempHost.staticListVM(filter));						
+	  		try{
+	  			tempHost=new Host(rs.getString("hostName"));
+	  			vmList.addAll(tempHost.staticListVM(filter));						
+	  		}catch(LibvirtException e){
+	  			//ignore
+	  		}
+	  		
 		}
 	  	return vmList;		                           
 	}
