@@ -34,7 +34,7 @@ public class Global extends GlobalSettings {
     		int timeout=1000;
     		
 //        ArrayList<String> hostURIList = new ArrayList<String>() ;
-    		String hostIP;
+    		String hostIP = "1";
     		DataSource ds=null;
     		Connect conn;
     		Connection dbConn=null;
@@ -48,7 +48,7 @@ public class Global extends GlobalSettings {
     				dbConn = ds.getConnection();
     				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
     			
-    				for (int i=82;i<144;i++) {
+    				for (int i=139;i<143;i++) {
     					hostIP=subnet + "." + i; 	 
     					try {
     						if (InetAddress.getByName(hostIP).isReachable(timeout)){

@@ -33,37 +33,19 @@
     </div>
     <div id="content">
         <div class="pure-menu pure-menu-open" id="sidebar">
-            <ul>
-                <li>
-                    <a href="#">Host-1</a>
-                </li>
-                <li>
-                    <a href="#">Host-2</a>
-                </li>
-                <li>
-                    <a href="#">Host-3</a>
-                </li>
-                <li>
-                    <a href="#">Host-4</a>
-                </li>
-                <li>
-                    <a href="#">Host-5</a>
-                </li>
-                <li>
-                    <a href="#">Host-6</a>
-                </li>
-                <li>
-                    <a href="#">Host-7</a>
+            <ul id="host-list">
+                <li class="host">
+                    <a href="#">All Hosts</a>
                 </li>
             </ul>
         </div>
         <div id="inner-content">
             <div id="tab-bar">
                 <ul>
-                    <li class="pure-button">Summery</li>
-                    <li class="pure-button">Static Listing</li>
-                    <li class="pure-button">Network</li>
-                    <li class="pure-button">Monitoring</li>
+                    <li class="pure-button tabs">Summary</li>
+                    <li class="pure-button tabs">Static Listing</li>
+                    <li class="pure-button tabs">Network</li>
+                    <li class="pure-button tabs">Monitoring</li>
                 </ul>
             </div>
             <div id="list-area">
@@ -94,6 +76,35 @@
     </div>
 </body>
 <script>
+    var sel;
+    var tabSel = "Summary";
+    
+    $.ajax ({
+         url: "/list/host",
+         type: "GET",
+         dataType: 'json',
+         success: function( json ) {
+                var i = 0;
+                var str = "";
+                
+                while(json[i++]){
+                    str += "<li class=\"host\"><a href=\"#\">" + json[i-1] + "</a></li>";
+                }
+                
+                $("#host-list").append(str);                
+        },
+         error: function( xhr, status ) {
+            alert("sorry there was a problem!");
+         },
+    });
+    
+    $(".tabs").click( function (event) {
+       tabSel = $(this).text();
+    });
+    
+    $("#host-list").on( "click", ".host" , function( event ) {
+        alert($(this).text() + tabSel);
+    });
 </script>
 
 </html>
