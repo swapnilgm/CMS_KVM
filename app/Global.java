@@ -118,18 +118,16 @@ public class Global extends GlobalSettings {
 	                " PRIMARY KEY ( hostIP ))"; 
 	    	stmt.executeUpdate(sql);
 	    	
-	   /* 	sql = "CREATE TABLE IF NOT EXISTS SavedImage " +
-	                "(uuid VARCHAR(255), " + 
+	    	sql = "CREATE TABLE IF NOT EXISTS SavedImage " +
+	                "(host VARCHAR(255), " + 
+	                " vm VARCHAR(255), " +
 	                " path VARCHAR(255), " + 
-	                " PRIMARY KEY(vm),"+
-	                "foreign key(hostIP) references host(hostIP))"; 
+	                "foreign key(host) references host(hostName))"; 
 	    	if((stmt.executeUpdate(sql))<0)
-	    		System.out.println("Created domain table in given database...");
-	   */ 		    	
+	    		System.out.println("Created vmState table in given database...");	
 	    	stmt.close();
 	    	dbConn.close();
 	    			    
-		    
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

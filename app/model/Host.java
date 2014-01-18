@@ -60,25 +60,38 @@ public class Host {
 	
     public int create(JsonNode json)  
     {
+    	String xml=new String();
     	//String shortdesc="creating with test aspp";
-		String xml=new String();
-		String bootDev=json.findPath("bootType").asText();
+    	String bootDev=json.findPath("bootType").asText();
 		 //os boot device "fd", "hd", "cdrom" or "network"
-      xml="  <domain type='kvm'>"+
-      "<name>"+json.findPath("vmName").textValue()+"</name>"+
-      "<memory unit='MiB'>"+String.valueOf(json.findPath("memory").asInt())+"</memory>"+
-      "<vcpu>"+String.valueOf(json.findPath("vcpu").asText())+"</vcpu>"+
-      "<os>"+
-        "<type arch='x86_64'>hvm</type>"+
-        "<boot dev='"+bootDev+"'/>"+
-      "</os>"+
-      "<clock offset='utc'/>"+
-      "<features>     <acpi/>       <apic/>	 <hap/><pae/>	     </features>"+
-      "<on_poweroff>destroy</on_poweroff>"+
-      "<on_reboot>restart</on_reboot>"+
-      "<on_crash>restart</on_crash>"+
-          "<devices>"+        
-       " <emulator>/usr/bin/kvm-spice</emulator>";
+		xml="  <domain type='kvm'>"+
+				"<name>"+json.findPath("vmName").textValue()+"</name>"+
+				"<memory unit='MiB'>"+String.valueOf(json.findPath("memory").asInt())+"</memory>"+
+				"<vcpu>"+String.valueOf(json.findPath("vcpu").asText())+"</vcpu>";
+		String title=json.findPath("title").textValue();
+		if(title!=null)
+			xml=xml.concat("<title>"+title+"</title>");
+		String description=json.findPath("description").textValue();
+		if(description!=null)
+			xml=xml.concat("<description>"+description+"/description>");
+		String arch=json.findPath("arch").textValue();
+		if(arch==null)
+			arch="'x86_64'";
+		xml=xml.concat("<os>"+
+				"<type arch='x86_64'>hvm</type>"+
+				"<boot dev='"+bootDev+"'/>");
+		String bootmenu=json.findPath("bootmenu").textValue();
+		if(bootmenu!=null)
+			xml=xml.concat("<bootmenu enable='"+bootmenu+"'>");
+		xml=xml.concat("</os>"+
+				"<clock offset='utc'/>"+
+				"<features>     <acpi/>       <apic/>	 <hap/><pae/>	     </features>"+
+				"<on_reboot>restart</on_reboot>"+
+				"<on_crash>restart</on_crash>"+
+				"<on_poweroff>destroy</on_poweroff>"+
+				"<devices>"+        
+				"<emulator>/usr/bin/kvm-spice</emulator>");
+	
       //disk device floppy", "disk", "cdrom
       switch (bootDev) {
       //case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
@@ -106,25 +119,14 @@ public class Host {
 		break;
 	}
       
-      /* "<disk type='file' device='cdrom'>"+
-          "<source file='/media/swapnil/Softwares/OS images/"+json.findPath("iso").asText()+".iso'/>"+
-         "<target dev='hdc'/>"+
-       "<readonly/>"+
-       "<boot order='1'/>"+
-       "</disk>"+ 
-        */
-     /* "<disk type='file' device='disk'>"+
-        "<source file='/media/swapnil/Storage/"+json.findPath("vmName").textValue()+".img'/>"+
-        "<target dev='hda'/>"+
-      "</disk>"+*/
       xml=xml.concat("<interface type='network'>"+
-          "<source network='default'/>"+
-        "</interface>"+
-        "<input type='mouse' />"+
-        "<graphics type='vnc' port='-1' autoport='yes'/>"+
-      "</devices>"+
-    "</domain>");
-      System.out.println(xml);
+    		  "<source network='default'/>"+
+    		  "</interface>"+
+    		  "<input type='mouse' />"+
+    		  "<graphics type='vnc' port='-1' autoport='yes'/>"+
+    		  "</domain>"+
+    		  "</devices>");
+      
 	    try {
 	    	if(json.findPath("persistant").asText().compareTo("Persistent")==0){
 	    		Domain vm=conn.domainDefineXML(xml);
