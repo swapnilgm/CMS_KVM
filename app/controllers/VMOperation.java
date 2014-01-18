@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 
 import play.db.DB;
 import play.mvc.*;
-import scalaz.std.effect.sql.connection;
+
 
 import org.libvirt.*;
 
@@ -103,7 +103,7 @@ public class VMOperation extends Controller{
 	//		if()
 			DataSource ds=DB.getDataSource();
 			Connection dbConn=ds.getConnection();
-			
+			dbConn.close();
 			return ok("saved");
 		} catch (LibvirtException e) {
 			e.printStackTrace();

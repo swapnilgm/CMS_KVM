@@ -220,7 +220,7 @@ public class Host {
 	       return vmList;		                           
 	}
 	        
-	public  ArrayList<Domain> dynamicListVM(String hypURI, int filter) throws LibvirtException {
+	public  ArrayList<Domain> dynamicListAllVM(String hypURI, int filter) throws LibvirtException {
 		
 	        conn=new Connect(hypURI,true); //connecting to hypervisor
 	        ArrayList<Domain> vmList=new ArrayList<Domain>();

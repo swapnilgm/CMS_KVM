@@ -35,21 +35,27 @@ public class Global extends GlobalSettings {
     		
 //        ArrayList<String> hostURIList = new ArrayList<String>() ;
     		String hostIP;
-    		DataSource ds=null;
     		Connect conn;
     		Connection dbConn=null;
     		PreparedStatement pstmt=null;
     		Statement stmt=null;
 			ResultSet rs=null;
-	
+			String local=new String("localhost");
+				try {
+					stmt=DB.getConnection().createStatement();
+					stmt.executeUpdate("INSERT INTO Host VALUES('"+local+"','"+local+"')");
+					stmt.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
     		while(true){
     			try {
-    				ds=DB.getDataSource();
-    				dbConn = ds.getConnection();
+    				dbConn = DB.getConnection();
     				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
-    			
     				for (int i=82;i<144;i++) {
-    					hostIP=subnet + "." + i; 	 
+    					hostIP=subnet + "." + i;
+    					    					   							
     					try {
     						if (InetAddress.getByName(hostIP).isReachable(timeout)){
     							String hostURI="qemu+tcp://"+hostIP+ "/system";
@@ -121,8 +127,7 @@ public class Global extends GlobalSettings {
 	    	sql = "CREATE TABLE IF NOT EXISTS SavedImage " +
 	                "(host VARCHAR(255), " + 
 	                " vm VARCHAR(255), " +
-	                " path VARCHAR(255), " + 
-	                "foreign key(host) references host(hostName))"; 
+	                " path VARCHAR(255))"; 
 	    	if((stmt.executeUpdate(sql))<0)
 	    		System.out.println("Created vmState table in given database...");	
 	    	stmt.close();
