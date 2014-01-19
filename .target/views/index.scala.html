@@ -5,19 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/view-style.css")" type="text/css">
-    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")">
-    </script>
+    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
     <title>View</title>
 </head>
 
 <body>
     <div id="top-bar">
-        <img src="@routes.Assets.at("images/cms(small).png")" id="logo">
+        <img src="@routes.Assets.at("images/cms.small.png")" id="logo">
         <i class="fa fa-github fa-2x" id="git"></i>
         <div class="pure-menu pure-menu-open pure-menu-horizontal" id="navbar">
             <ul>
                 <li>
-                    <a href="#">Home</a>
+                    <a href="main.html">Home</a>
                 </li>
                 <li>
                     <a href="#">Settings</a>
@@ -32,45 +32,47 @@
         </div>
     </div>
     <div id="content">
-        <div class="pure-menu pure-menu-open" id="sidebar">
-            <ul id="host-list">
-                <li class="host">
-                    <a href="#">All Hosts</a>
-                </li>
-            </ul>
+        <div id="sidebar">
+            <ol id="selectable">
+
+            </ol>
         </div>
         <div id="inner-content">
             <div id="tab-bar">
                 <ul>
-                    <li class="pure-button tabs">Summary</li>
-                    <li class="pure-button tabs">Static Listing</li>
-                    <li class="pure-button tabs">Network</li>
-                    <li class="pure-button tabs">Monitoring</li>
+                    <li class="pure-button">Summary</li>
+                    <li class="pure-button">Static Listing</li>
+                    <li class="pure-button">Network</li>
+                    <li class="pure-button">Monitoring</li>
                 </ul>
             </div>
             <div id="list-area">
                 <div id="button-bar">
-                    <ul>
-                        <li class="pure-button">
-                            <i class="fa fa-play fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-pause fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-times-circle fa-2x" id="red"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-plus fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-stop fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-refresh fa-2x"></i>
-                        </li>
-                    </ul>
+                    <i class="fa fa-play fa-2x icons"></i>
+                    <i class="fa fa-pause fa-2x icons"></i>
+                    <i class="fa fa-stop fa-2x icons"></i>
+                    <i class="fa fa-refresh fa-2x icons"></i>
+                    <i class="fa fa-times fa-2x icons"></i>
+                    <i class="fa fa-plus fa-2x icons"></i>
                 </div>
+                <table class="pure-table" id="summary-list">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Model</th>
+                            <th>Memory</th>
+                            <th>Cpus</th>
+                            <th>Speed</th>
+                            <th>Nodes</th>
+                            <th>Sockets</th>
+                            <th>Cores</th>
+                            <th>Thread</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -78,6 +80,7 @@
 <script>
     var sel;
     var tabSel = "Summary";
+    var hostName = [];
     
     $.ajax ({
          url: "/list/host",
@@ -88,10 +91,10 @@
                 var str = "";
                 
                 while(json[i++]){
-                    str += "<li class=\"host\"><a href=\"#\">" + json[i-1] + "</a></li>";
+                    str += "<li class=\"ui-widget-content\">" + json[i-1] + "</li>";
                 }
                 
-                $("#host-list").append(str);                
+                $("#selectable").append(str);                
         },
          error: function( xhr, status ) {
             alert("sorry there was a problem!");
@@ -102,9 +105,19 @@
        tabSel = $(this).text();
     });
     
-    $("#host-list").on( "click", ".host" , function( event ) {
-        alert($(this).text() + tabSel);
-    });
+    $("#selectable").on("selectableselected", function( event , ui ){
+        var str = $(ui.selected).text();
+        
+        if(tabSel == "Summary" && hostName.indexOf( str ) == -1 ) {
+            hostName.push( str );
+            $.getJSON("/hostinfo/" + str , function( resp ) {
+                $("table.pure-table > tbody").append("<tr><td>" + str + "</td><td>" + resp.model + "</td><td>" + resp.memory + "</td><td>" + resp.cpus + "</td><td>" + resp.mhz + "</td><td>" + resp.nodes + "</td><td>" + resp.sockets + "</td><td>" + resp.cores + "</td><td>" + resp.thread + "</td></tr>");
+            });
+        }
+});
+    
+     $(function() {
+		$( "#selectable" ).selectable();
+	 });
 </script>
-
 </html>

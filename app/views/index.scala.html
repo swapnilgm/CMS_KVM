@@ -5,14 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/view-style.css")" type="text/css">
-    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")">
-    </script>
+    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
     <title>View</title>
 </head>
 
 <body>
     <div id="top-bar">
-        <img src="@routes.Assets.at("images/cms(small).png")" id="logo">
+        <img src="@routes.Assets.at("images/cms.small.png")" id="logo">
         <i class="fa fa-github fa-2x" id="git"></i>
         <div class="pure-menu pure-menu-open pure-menu-horizontal" id="navbar">
             <ul>
@@ -32,79 +32,75 @@
         </div>
     </div>
     <div id="content">
-        <div class="pure-menu pure-menu-open" id="sidebar">
-            <ul id="host-list">
-                <li class="host">
-                    <a href="#">All Hosts</a>
-                </li>
-            </ul>
+        <div id="sidebar">
+            <ol id="selectable">
+                <li class="ui-widget-content">ajinkya</li>
+                <li class="ui-widget-content">swapnil</li>
+            </ol>
         </div>
         <div id="inner-content">
-            <div id="tab-bar">
-                <ul>
-                    <li class="pure-button tabs">Summary</li>
-                    <li class="pure-button tabs">Static Listing</li>
-                    <li class="pure-button tabs">Network</li>
-                    <li class="pure-button tabs">Monitoring</li>
-                </ul>
-            </div>
-            <div id="list-area">
-                <div id="button-bar">
-                    <ul>
-                        <li class="pure-button">
-                            <i class="fa fa-play fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-pause fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-times-circle fa-2x" id="red"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-plus fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-stop fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-refresh fa-2x"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <ul class="tab-list">
+                <li class="tabs"><a href="#summary">Summary</a></li>
+                <li class="tabs"><a href="#static-list">Static Listing</a></li>
+                <li class="tabs"><a href="#network">Network</a></li>
+                <li class="tabs"><a href="#monitoring">Monitoring</a></li>
+            </ul>
+             <div id="button-bar">
+                <i class="fa fa-play fa-2x icons"></i>
+                <i class="fa fa-pause fa-2x icons"></i>
+                <i class="fa fa-stop fa-2x icons"></i>
+                <i class="fa fa-refresh fa-2x icons"></i>
+                <i class="fa fa-times fa-2x icons"></i>
+                <i class="fa fa-plus fa-2x icons"></i>
+             </div>
+             <div id="summary">
+                 <table class="pure-table inner-table">
+                     <tbody>
+                         <tr>
+                             <td>Model</td>
+                         </tr>
+                         <tr>
+                             <td>Memory</td>
+                         </tr>
+                         <tr>
+                             <td>Cpus</td>
+                         </tr>
+                         <tr>
+                             <td>Speed</td>
+                         </tr>
+                         <tr>
+                             <td>Nodes</td>
+                         </tr>
+                         <tr>
+                             <td>Sockets</td>
+                         </tr>
+                         <tr>
+                             <td>Cores</td>
+                         </tr>
+                         <tr>
+                             <td>Threads</td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+             <div id="static-list">
+                 <table class="pure-table inner-table">
+                     <thead>
+                         <tr>
+                             <th>Id</th>
+                             <th>Name</th>
+                             <th>NoOfCpus</th>
+                             <th>MaxMemory</th>
+                         </tr>
+                     </thead>
+                     <tbody>  
+                     </tbody>
+                 </table>
+             </div>
+             <div id="network"></div>
+             <div id="monitoring"></div>
         </div>
     </div>
 </body>
-<script>
-    var sel;
-    var tabSel = "Summary";
-    
-    $.ajax ({
-         url: "/list/host",
-         type: "GET",
-         dataType: 'json',
-         success: function( json ) {
-                var i = 0;
-                var str = "";
-                
-                while(json[i++]){
-                    str += "<li class=\"host\"><a href=\"#\">" + json[i-1] + "</a></li>";
-                }
-                
-                $("#host-list").append(str);                
-        },
-         error: function( xhr, status ) {
-            alert("sorry there was a problem!");
-         },
-    });
-    
-    $(".tabs").click( function (event) {
-       tabSel = $(this).text();
-    });
-    
-    $("#host-list").on( "click", ".host" , function( event ) {
-        alert($(this).text() + tabSel);
-    });
-</script>
-
+<script src="@routes.Assets.at("javascripts/view.js")"></script>
 </html>

@@ -2,70 +2,107 @@
 @import url("pure-min.css");
 @import url("Font-Awesome/css/font-awesome.css");
 
+.tabs {
+    display: inline-block;
+    padding: 5px;
+}
+
+.tab-list {
+    margin-left: 20px;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 120%;
+}
+
+.inner-table {
+    margin: 20px 40px;
+}
+
+#button-bar {
+    margin-left: 20px;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+#summary-list {
+    margin-left: 50px;
+    margin-top: 30px;
+}
+#feedback {
+    font-size: 120%;
+}
+
+#selectable .ui-selecting {
+    background: #ddaaaa;
+}
+
+#selectable .ui-selected {
+    background: #dd9999;
+    color: #222222;
+}
+
+#selectable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+}
+
+#selectable li {
+    margin: 3px;
+    padding: 0.4em;
+}
+
+.icons {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 #top-bar {
     display: inline-block;
     background-color: silver;
     width: 100%;
 }
-
 #content {
-   display: inline-block;
+    display: inline-block;
     margin-top: 40px;
     width: 100%;
 }
-
 #sidebar {
+    background-color: silver;
     width: 200px;
     height: 400px;
-    float:left;
+    float: left;
     display: inline-block;
+    font-size: 120%;
 }
-
 #navbar {
     float: right;
     width: auto;
     background-color: inherit;
     padding: 10px;
 }
-
 #logo {
     background-color: silver;
     margin-left: 10px;
     padding: 10px;
 }
-
 #logo:hover {
     cursor: pointer;
 }
-
 #inner-content {
+    display: inline-block;
     background-color: silver;
     width: 1000px;
-    height: 400px;
     float: right;
 }
-
-#tab-bar {
-    width: inherit;
-}
-
-#button-bar {
-    width: inherit;
-}
-
 #git {
     padding: 13px;
-    color: rgba( 20, 20, 20, 0.8);
+    color: rgba(20, 20, 20, 0.8);
     vertical-align: top;
 }
-
 #git:hover {
-    color: #39bbbb;
+    color: #395;
 }
-
-#red {
-    color: red;
-}
-
 body {
     margin: 20px 30px;
+}

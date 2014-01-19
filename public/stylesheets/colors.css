@@ -122,24 +122,22 @@
 
 /* PRETTIER LINKS */
 a {
+  color: #aa3388;
   text-decoration: none;
   -webkit-transition: color .3s ease-in-out;
   transition: color .3s ease-in-out; }
 
 a:link {
-  color: #0074d9;
-  -webkit-transition: color .3s ease-in-out;
-  transition: color .3s ease-in-out; }
-
-a:visited {
-  color: #b10dc9; }
+  color: #aa2222;
+  -webkit-transition: color .1s ease-in-out;
+  transition: color .1s ease-in-out; }
 
 a:hover {
-  color: #7fdbff;
-  -webkit-transition: color .3s ease-in-out;
-  transition: color .3s ease-in-out; }
+  color: #aa3333;
+  -webkit-transition: color .1s ease-in-out;
+  transition: color .1s ease-in-out; }
 
 a:active {
-  color: #ff851b;
-  -webkit-transition: color .3s ease-in-out;
-  transition: color .3s ease-in-out; }
+  color: #aa3355;
+  -webkit-transition: color .1s ease-in-out;
+  transition: color .1s ease-in-out; }
