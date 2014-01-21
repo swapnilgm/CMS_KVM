@@ -3,8 +3,9 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.*;
-
 import javax.sql.DataSource;
+
+import model.Host;
 
 import org.libvirt.*;
 
@@ -18,11 +19,50 @@ public class Global extends GlobalSettings {
     	initDB();
     		//get subnet 
     	new Thread(new LoadHostList("192.168.43")).start();
-			
-		
+    	Host.loadDynamicList();
+    	
     }
     
-    private class LoadHostList implements Runnable{
+    private void initDB() {
+		//create tables
+		DataSource ds=DB.getDataSource();
+		Connection dbConn=null;
+		Statement stmt=null;
+		
+		try {
+			System.out.println("Creating table in given database...");
+			dbConn = ds.getConnection();
+		    stmt= dbConn.createStatement();
+		    String sql="CREATE TABLE IF NOT EXISTS Host " +
+	                "(hostIP VARCHAR(255), " + 
+	                " hostName VARCHAR(255) NOT NULL, " + 
+	                " PRIMARY KEY ( hostIP ))"; 
+	    	stmt.executeUpdate(sql);
+	    	
+	    	sql = "CREATE TABLE IF NOT EXISTS snapshot " +
+	                "(vmuuid VARCHAR(255) NOT NULL, " +
+	                " path VARCHAR(255) NOT NULL, "+
+	                "PRIMARY KEY ( vmuuid ))"; 
+	    	if((stmt.executeUpdate(sql))<0)
+	    		System.out.println("Created snapshot table in given database...");
+	    	sql = "CREATE TABLE IF NOT EXISTS activeVM " +
+	                "(vmuuid VARCHAR(255) NOT NULL, " +
+	                " state VARCHAR(255) NOT NULL, "+
+	                " cpu DECIMAL(5,2) NOT NULL, "+
+	                " memory DECIMAL(5,2) NOT NULL, "+
+	                "PRIMARY KEY ( vmuuid )) WITH OIDS";  
+	    	if((stmt.executeUpdate(sql))<0)
+	    		System.out.println("Created vmSaveSnapshot table in given database...");
+	    	stmt.close();
+	    	dbConn.close();
+	    			    
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private class LoadHostList implements Runnable{
     	String subnet=null;
     	
     	public LoadHostList (String subnet) {
@@ -107,36 +147,6 @@ public class Global extends GlobalSettings {
     		}
     	}
     }
-    
-    private void initDB() {
-    	//create tables
-    	DataSource ds=DB.getDataSource();
-    	Connection dbConn=null;
-    	Statement stmt=null;
-    	
-		try {
-			System.out.println("Creating table in given database...");
-			dbConn = ds.getConnection();
-		    stmt= dbConn.createStatement();
-		    String sql="CREATE TABLE IF NOT EXISTS Host " +
-	                "(hostIP VARCHAR(255), " + 
-	                " hostName VARCHAR(255) NOT NULL, " + 
-	                " PRIMARY KEY ( hostIP ))"; 
-	    	stmt.executeUpdate(sql);
-	    	
-	    	sql = "CREATE TABLE IF NOT EXISTS SavedImage " +
-	                "(host VARCHAR(255), " + 
-	                " vm VARCHAR(255), " +
-	                " path VARCHAR(255))"; 
-	    	if((stmt.executeUpdate(sql))<0)
-	    		System.out.println("Created vmState table in given database...");	
-	    	stmt.close();
-	    	dbConn.close();
-	    			    
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-}
+
+	}
 

@@ -56,7 +56,7 @@ public class Application extends Controller {
 				vmList=tempHost.staticListVM(filter);
 			}
 			ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
-			ObjectNode jso=null;jso=Json.newObject();
+			ObjectNode jso=Json.newObject();
 			
 			for (Domain vm : vmList) {
 				jso=Json.newObject();
@@ -74,7 +74,7 @@ public class Application extends Controller {
 		} catch (LibvirtException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Oops getstaitc list");
+			return internalServerError("Oops unable to connect to host");
 		}	            
 	}
 	
@@ -149,7 +149,6 @@ public class Application extends Controller {
 		Host tempHost;
 		try {
 			tempHost = new Host(hostName);
-			
 			JsonNode js=Json.toJson(tempHost.conn.nodeInfo());
 			return ok(js);		
 		} catch (LibvirtException e) {
@@ -160,18 +159,24 @@ public class Application extends Controller {
 		
 	}
 	
-	public static Result getDynamicList(String hostURI, int filter) {
+	public static Result getDynamicList(String hostName, int filter) {
 		
-		//        ArrayList<Domain> vm = new Host(hostURI).dynamicListVM(filter);
-		//      if(vm == null)
-		//    	return ok("Connection Lost");
-		
-		
-		return TODO;
-		
+		Host tempHost;
+		try {
+			tempHost = new Host(hostName);
+			JsonNode js=tempHost.dynamicListVM();
+			return ok(js);		
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return notFound("Oops, Connection to Host is lost");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Database connection error");
+		}		
 	}
-	
-	
+		
 	public static Result refresh(String hostURI, int filter) throws LibvirtException {
 		return redirect(routes.Application.getStaticList(hostURI,filter));
 	}

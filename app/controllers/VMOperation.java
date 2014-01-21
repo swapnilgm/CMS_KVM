@@ -3,8 +3,6 @@ package controllers;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 import play.db.DB;
 import play.mvc.*;
 
@@ -20,8 +18,16 @@ public class VMOperation extends Controller{
 	public static Result start(String vmName, String hostName) {
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).create();
-			return ok("started");
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			}
+			if(vm.create()==0){
+				return ok("started");
+			}
+			else {
+				return ok("Failed to start");
+			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
 			return internalServerError("Oops unable to start");
@@ -31,8 +37,15 @@ public class VMOperation extends Controller{
 	public static Result shutdown(String vmName, String hostName) {
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).shutdown();
-			return ok("shutdown");
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			}
+			if(vm.isActive()==1){
+				vm.shutdown();
+				return ok("shutdown signal sent");
+			}
+			else return badRequest("vm is not running.");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
 			return internalServerError("Oops unable to shutdown");
@@ -43,8 +56,15 @@ public class VMOperation extends Controller{
 	public static Result reboot(String vmName,String hostName) {
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).reboot(0);
-			return ok("rebooted");
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			}
+			if(vm.isActive()==1){
+				vm.reboot(0);
+				return ok("rebooted");
+			}
+			else return badRequest("vm is not running.");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
 			return internalServerError("Oops unable to reboot");
@@ -54,7 +74,11 @@ public class VMOperation extends Controller{
 	public static Result destroy(String vmName, String hostName) {
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).destroy();
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");		
+			}
+			vm.destroy();
 			return ok("destroyed");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
@@ -65,18 +89,28 @@ public class VMOperation extends Controller{
 	public static Result suspend(String vmName, String hostName){
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).suspend();
-			return ok("suspended");
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null)
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			if(vm.isActive()==1){
+				vm.suspend();
+				return ok("suspended");
+			}
+			else return badRequest("vm is not running.");
+			
 		} catch (LibvirtException e) {
-			e.printStackTrace();
-			return internalServerError("Oops unable to suspend");
+			return internalServerError(e.getMessage());
 		}
 	}
 	
 	public static Result resume(String vmName, String hostName){
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).resume();				
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			}
+			vm.resume();				
 			return ok("resumed");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
@@ -87,8 +121,13 @@ public class VMOperation extends Controller{
 	public static Result delete(String vmName, String hostName) {
 		try {
 			Host tempHost=new Host(hostName);
-			tempHost.conn.domainLookupByName(vmName).undefine(3);
+			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			if(vm==null){
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			}
+			vm.undefine(3);
 			return ok("deleted");
+			
 		} catch (LibvirtException e) {
 			e.printStackTrace();
 			return internalServerError("Oops unable to Delete");
@@ -99,10 +138,9 @@ public class VMOperation extends Controller{
 		try {
 			String to=new String(); 
 			Host tempHost=new Host(hostName);
+			
 			tempHost.conn.domainLookupByName(vmName).save(to);
-	//		if()
-			DataSource ds=DB.getDataSource();
-			Connection dbConn=ds.getConnection();
+			Connection dbConn=DB.getConnection();
 			dbConn.close();
 			return ok("saved");
 		} catch (LibvirtException e) {
@@ -148,6 +186,8 @@ public class VMOperation extends Controller{
 			Host tempHost=new Host(hostName);
 			Domain vm=tempHost.conn.domainLookupByName(vmName);
 			DomainSnapshot vmSnap=vm.snapshotLookupByName(snapshot);
+			if(vmSnap==null)
+				return notFound("Sanpshot "+snapshot+"not found.");
 			if(vm.revertToSnapshot(vmSnap)==0){
 				return ok("Successful revert");
 			}else {
@@ -156,7 +196,7 @@ public class VMOperation extends Controller{
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Opps unable to resume");
+			return internalServerError("Opps unable to revert");
 		}
 	}
 }        

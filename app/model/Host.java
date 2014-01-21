@@ -2,18 +2,19 @@ package model;
 	
 import java.sql.*;
 import java.util.ArrayList;
-import javax.sql.DataSource;
+
 import org.libvirt.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import play.db.DB;
+import play.libs.Json;
 
 public class Host {
 	
 	public Connect conn;
-	static DataSource ds=DB.getDataSource();
-	static Connection dbConn;
+	static Connection dbConn=DB.getConnection();
 	static Statement stmt;
 	static ResultSet rs;
 	//private String hostIP;
@@ -24,7 +25,7 @@ public class Host {
 		String hostIP=null;
     // 	#sql {select hostIPaddr into :hostIP from host where hostname =  :hostname };
 		try {
-			dbConn =ds.getConnection();
+			dbConn =DB.getConnection();
 			stmt=dbConn.createStatement();
 			
 			String query="SELECT hostIP FROM Host WHERE hostName = '"+ hostName+"'";
@@ -45,7 +46,7 @@ public class Host {
 	
 	
 	public static ArrayList<String> getHostList() throws SQLException  {
-			dbConn =ds.getConnection();
+			dbConn =DB.getConnection();
 			stmt=dbConn.createStatement();
 		  	String query="SELECT hostName FROM Host";
 		  	rs = stmt.executeQuery(query);
@@ -92,21 +93,20 @@ public class Host {
 				"<devices>"+        
 				"<emulator>/usr/bin/kvm-spice</emulator>");
 	
-      //disk device floppy", "disk", "cdrom
+		//disk device floppy", "disk", "cdrom
       switch (bootDev) {
       //case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
-	
 		//	break;
       case "cdrom": xml=xml.concat("<disk type='file' device='cdrom'>"+
 			"<source file='"+json.findPath("iso").asText()+"'/>"+
-    	         "<target dev='hdc'/>"+
-    	         "<readonly/>"+
-    	          "</disk>");
+			"<target dev='hdc'/>"+
+			"<readonly/>"+
+    		  "</disk>");
 	
       break;
       case "hd": xml=xml.concat("<disk type='file' device='disk'>"+
     		  "<source file='"+json.findPath("disk").asText()+"/>"+
-    	        "<target dev='hda'/>"+
+    		  "<target dev='hda'/>"+
     	      "</disk>");
       
       break;
@@ -165,10 +165,8 @@ public class Host {
     	return TODO;
     }
 */
-	public  static ArrayList<Domain> staticListAllVM(int filter) throws LibvirtException, SQLException {
-		DataSource ds = DB.getDataSource();
-    	Connection dbConn=ds.getConnection();
-    	Statement stmt=dbConn.createStatement();
+	public synchronized static ArrayList<Domain> staticListAllVM(int filter) throws LibvirtException, SQLException {
+		Statement stmt=dbConn.createStatement();
     	String query="SELECT hostName FROM Host";
 	  	ResultSet rs = stmt.executeQuery(query);
 	  	ArrayList<Domain> vmList=new ArrayList<Domain>();
@@ -183,6 +181,8 @@ public class Host {
 	  		}
 	  		
 		}
+	  	rs.close();
+	  	stmt.close();
 	  	return vmList;		                           
 	}
 	 
@@ -220,24 +220,84 @@ public class Host {
 	       return vmList;		                           
 	}
 	        
-	public  ArrayList<Domain> dynamicListAllVM(String hypURI, int filter) throws LibvirtException {
-		
-	        conn=new Connect(hypURI,true); //connecting to hypervisor
-	        ArrayList<Domain> vmList=new ArrayList<Domain>();
-	                       
-	        if(filter == 1) {
-	        	int[] activeVMs = conn.listDomains();
-	            for(int i = 0; i < conn.numOfDomains(); i++)
-	            {
-	            	vmList.add(conn.domainLookupByID(activeVMs[i]));
-	            }                                
-	        }                        
-	                                
-	        conn.close();
-	        return vmList;
-                           
+	public  JsonNode dynamicListVM() throws LibvirtException, SQLException {
+		dbConn=DB.getConnection();
+		String sql="SELELCT * FROM activeVM WHERE vmuuid = ? ORDER BY OID DESC";
+		PreparedStatement pstmt=dbConn.prepareStatement(sql);
+		ResultSet rs=null;
+		int [] vmID = conn.listDomains();
+		ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
+		ObjectNode jso=null;
+		Domain vm=null;
+		for(int id: vmID) {
+			vm=conn.domainLookupByID(id);
+			pstmt.setString(1, vm.getUUIDString());
+			rs=pstmt.executeQuery();
+			while (rs.next()) {
+				jso=Json.newObject();
+				jso.put("id",id);
+				jso.put("name",vm.getName());
+				jso.put("cpu",rs.getFloat("cpu"));
+				jso.put("memory",rs.getFloat("memory"));
+				jso.put("state",rs.getFloat("state"));
+				jsolist.add(jso);
+				jso=null;
+			}	
+		}
+		return Json.toJson(jsolist);      
 	}
 	
+	public static void loadDynamicList() {
+		new Thread(new DynamicVM()).start();
+		
+	}
+	
+	private static class DynamicVM implements Runnable{
+		
+		public void run() {
+			ArrayList<Domain> vmList;
+			Connection dbConn=DB.getConnection();
+			PreparedStatement inprepstmt,delprepstmt;
+			DomainInfo vmInfo=null;
+			float percpu,permem;
+			try {
+				inprepstmt = dbConn.prepareStatement("INSERT INTO activeVM VALUES(?,?,?,?)");
+				delprepstmt = dbConn.prepareStatement("DELETE FROM activeVM WHERE OID IN "+
+						"(SELECT ROWID FROM activeVM WHERE vmuuid = ? ORDER BY OID DESC OFFSET 100)");
+				//missing case for deleting inactive vm list
+				while(true){
+					try {
+						vmList=Host.staticListAllVM(1);
+						for( Domain vm : vmList) {
+							try {
+								vmInfo = vm.getInfo();
+								percpu = vmInfo.cpuTime*100;
+								permem = vmInfo.memory*100/vmInfo.maxMem;
+								inprepstmt.setString(1,vm.getUUIDString());
+								inprepstmt.setString(2,vmInfo.state.toString());
+								inprepstmt.setFloat(3,percpu);
+								inprepstmt.setFloat(4,permem);
+								inprepstmt.executeUpdate();
+								delprepstmt.setString(1,vm.getUUIDString());
+								delprepstmt.executeUpdate();
+							} catch (SQLException | LibvirtException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					} catch (LibvirtException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
 	
 	/*
 	private enum ListVMFilter {
