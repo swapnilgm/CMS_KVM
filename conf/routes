@@ -28,7 +28,8 @@ PUT	 /list/dynamic/suspend		controllers.VMOperation.suspend(vmName : String, hos
 PUT	 /list/dynamic/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
 #power off signal
 PUT	 /list/dynamic/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
-
+#dynamic usages
+GET  /list/dynamic/:hostName		controllers.Application.getDynamicList(hostName : String)
 POST  /create/:hostName			controllers.Application.createVM(hostName : String)
 POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
 # Map static resources from the /public folder to the /assets URL path

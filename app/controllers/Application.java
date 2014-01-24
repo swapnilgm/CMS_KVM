@@ -6,8 +6,8 @@ import org.libvirt.LibvirtException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import dbal.Dba;
 import model.Host;
-import play.db.DB;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
@@ -15,14 +15,8 @@ import views.html.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-import javax.sql.DataSource;
 
 public class Application extends Controller {
-	
-	static ArrayList<String> hostList;
-	static DataSource ds= DB.getDataSource();
-	static Connection dbConn=null;
-	static Statement stmt=null;
 	
 	public static Result index()  {
 		return ok(index.render(""));
@@ -30,9 +24,11 @@ public class Application extends Controller {
 	
 	public static Result getHostList()  {
 		try{
-			ArrayList<String> hostList = Host.getHostList();
+			Dba db=new Dba();
+			ArrayList<String> hostList = db.getHostList();
+			db.close();
 			JsonNode json=Json.toJson(hostList);        		
-			//response().setContentType("application/json");
+			response().setContentType("application/json");
 			return ok(json);		  	
 			
 		} catch (SQLException e) {
@@ -51,9 +47,11 @@ public class Application extends Controller {
 				vmList=Host.staticListAllVM(filter);
 			}
 			else {
-				
+				if(!Host.ishostExist(hostName))
+					return notFound();
 				Host tempHost=new Host(hostName);
-				vmList=tempHost.staticListVM(filter);
+				vmList=tempHost.listVM(filter);
+				tempHost.close();
 			}
 			ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
 			ObjectNode jso=Json.newObject();
@@ -71,23 +69,37 @@ public class Application extends Controller {
 			}
 			
 			return ok(Json.toJson(jsolist));		
-		} catch (LibvirtException | SQLException e) {
+		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return internalServerError("Oops unable to connect to host");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		}	            
 	}
 	
 	
 	public static Result validateVMName(String hostName,String vmName) {
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
 			Host tempHost=new Host(hostName);
-			if(tempHost.conn.domainLookupByName(vmName)!=null);
-			return ok();
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();
+				return ok("");
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return internalServerError("Oops, Connection to Host is lost");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		}       	
 	}        
 	
@@ -99,6 +111,10 @@ public class Application extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return notFound("Cannot create Host connection");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		} 
 		JsonNode json=request().body().asJson();
 		if(json == null) {
@@ -127,14 +143,14 @@ public class Application extends Controller {
 							return badRequest("Missing parameter [bootType]");
 						} else {
 							
-							if(tempHost.create(json)==-1){
+							if(tempHost.createVM(json)==-1){
 								
 								return internalServerError("Server error");
-							}else if (tempHost.create(json)==0){
+							}else if (tempHost.createVM(json)==0){
 								
 								return badRequest("Cannot create vm");
 							}else {
-								return ok("vm created");
+								return created();
 							}
 							
 						}
@@ -148,23 +164,32 @@ public class Application extends Controller {
 		
 		Host tempHost;
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound();
 			tempHost = new Host(hostName);
-			JsonNode js=Json.toJson(tempHost.conn.nodeInfo());
+			JsonNode js=tempHost.getHostInfo();
+			tempHost.close();
 			return ok(js);		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return notFound("Oops, Connection to Host is lost");
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		} 
 		
 	}
 	
-	public static Result getDynamicList(String hostName, int filter) {
-		
+	public static Result getDynamicList(String hostName) {	
 		Host tempHost;
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound();
 			tempHost = new Host(hostName);
-			JsonNode js=tempHost.dynamicListVM();
+			JsonNode js=tempHost.getRuntimeVMStatus();
+			tempHost.close();
 			return ok(js);		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block

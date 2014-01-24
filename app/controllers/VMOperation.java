@@ -1,202 +1,268 @@
 package controllers;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import play.db.DB;
+import org.libvirt.LibvirtException;
+
 import play.mvc.*;
-
-
-import org.libvirt.*;
-
-import model.Host;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import model.VM;
 
 public class VMOperation extends Controller{
 	
 	public static Result start(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
+			vm=new VM();
+			switch(vm.start(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
-			}
-			if(vm.create()==0){
-				return ok("started");
-			}
-			else {
+			case 0:
 				return ok("Failed to start");
+			case 1:
+				return ok("started");
+			default: 
+				return ok("ok");
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to send shutdown signal");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
 		}    
 	}
 	
 	public static Result shutdown(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
+			vm=new VM();
+			switch(vm.shutdown(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
-			}
-			if(vm.isActive()==1){
-				vm.shutdown();
+			case 0:
+				return badRequest("vm is not running.");
+			case 1:
 				return ok("shutdown signal sent");
+			default: 
+				return ok("ok");
 			}
-			else return badRequest("vm is not running.");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to shutdown");
-		}       	
+			return internalServerError("Oops unable to start");
+		}catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   		   	
 	}        
-
+	
 	//for following op check for the flags
-	public static Result reboot(String vmName,String hostName) {
+	public static Result reboot(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
+			vm=new VM();
+			switch(vm.reboot(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
-			}
-			if(vm.isActive()==1){
-				vm.reboot(0);
+			case 0:
+				return badRequest("vm is not running.");
+			case 1:
 				return ok("rebooted");
+			default: 
+				return ok("ok");
 			}
-			else return badRequest("vm is not running.");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to reboot");
-		}
+			return internalServerError("Oops unable to start");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   	
 	}
 	
 	public static Result destroy(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
-				return notFound("No vm "+vmName+" found on host"+hostName+".");		
+			vm=new VM();
+			switch(vm.destroy(vmName, hostName)){
+			case -1:
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 1:
+				return ok("destroyed");	//force oof
+			default: 
+				return ok("ok");
 			}
-			vm.destroy();
-			return ok("destroyed");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to destroy");
-		}
+			return internalServerError("Oops unable to start");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   
 	}        
 	
 	public static Result suspend(String vmName, String hostName){
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null)
+			vm=new VM();
+			switch(vm.suspend(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
-			if(vm.isActive()==1){
-				vm.suspend();
+			case 0:
+				return badRequest("vm is not running.");
+			case 1:
 				return ok("suspended");
+			default: 
+				return ok("ok");
 			}
-			else return badRequest("vm is not running.");
-			
 		} catch (LibvirtException e) {
-			return internalServerError(e.getMessage());
-		}
+			e.printStackTrace();
+			return internalServerError("Oops unable to start");
+		}	catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   
 	}
 	
 	public static Result resume(String vmName, String hostName){
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
+			vm=new VM();
+			switch(vm.resume(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 1:
+				return ok("resumed");
+			default: 
+				return ok("ok");
 			}
-			vm.resume();				
-			return ok("resumed");
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Opps unable to resume");
-		}
+			return internalServerError("Oops unable to start");
+		}	catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   
 	}
 	
 	public static Result delete(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			if(vm==null){
+			vm=new VM();
+			switch(vm.delete(vmName, hostName)){
+			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 1:
+				return ok("deleted");
+			default: 
+				return ok("ok");
 			}
-			vm.undefine(3);
-			return ok("deleted");
-			
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to Delete");
-		}
-	}
+			return internalServerError("Oops unable to start");
+		}catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database server connectivity.");
+		}   
+	}	
 	
 	public static Result save(String vmName, String hostName) {
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			String to=new String(); 
-			Host tempHost=new Host(hostName);
-			
-			tempHost.conn.domainLookupByName(vmName).save(to);
-			Connection dbConn=DB.getConnection();
-			dbConn.close();
-			return ok("saved");
+			vm=new VM();
+			switch(vm.save(vmName, hostName)){
+			case -1:
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 1:
+				return ok("saved");
+			default: 
+				return ok("ok");
+			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
 			return internalServerError("Oops unable to save domain");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Oops database server connectivity error");
-		}
+			return internalServerError("Oops database server connectivity.");
+		}   
 	}     
 	
 	public static Result snapshot(String vmName, String hostName){
+		VM vm;
+		//validateHostName
+		//validteVMName
 		try {
-			String xmlDesc=new String("<domainsnapshot>");
-			JsonNode json=request().body().asJson();
-       	    String name = json.findPath("Name").textValue();
-       	    if(name != null) {
-       	    	xmlDesc=xmlDesc.concat("<name>"+name+"</name>");
-       	    } 
-       	    String description = json.findPath("Description").textValue();
-    	    if(description != null) {
-    	    	xmlDesc=xmlDesc.concat("<name>"+description+"</name>");
-    	    } 
-    	    xmlDesc=xmlDesc.concat("</domainsnapshot>");
-    	    Host tempHost=new Host(hostName);
-    	    DomainSnapshot domSnap=tempHost.conn.domainLookupByName(vmName).snapshotCreateXML(xmlDesc);
-    	    if(domSnap!=null){
-    	    	return ok("snapshot created");
-    	    }
-    	    else {
-    	    	return ok("Opps unable to create snapshot");
+			vm=new VM();
+			switch(vm.snapshot(hostName, vmName, request().body().asJson())){
+			case -1:
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 0:
+				return ok("Opps unable to create snapshot");
+			case 1:
+				return ok("snapshot created");
+			default: 
+				return ok("ok");
 			}
 		} catch (LibvirtException e) {
+			e.printStackTrace();
+			return internalServerError("Oops unable to start");
+		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Opps connection error");
-		}
+			return internalServerError("Oops database server connectivity.");
+		}	
+		
 	}
 	
 	public static Result revert(String vmName, String hostName, String snapshot){
+		VM vm;
+		//validateHostName
+		//validteVMName
+		//snapshot name validation
 		try {
-			Host tempHost=new Host(hostName);
-			Domain vm=tempHost.conn.domainLookupByName(vmName);
-			DomainSnapshot vmSnap=vm.snapshotLookupByName(snapshot);
-			if(vmSnap==null)
-				return notFound("Sanpshot "+snapshot+"not found.");
-			if(vm.revertToSnapshot(vmSnap)==0){
-				return ok("Successful revert");
-			}else {
+			vm=new VM();
+			switch(vm.revert(vmName, hostName, snapshot)){
+			case -2:return notFound("snapshot not found");
+			case -1:
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 0:
 				return ok("Unsuccessful revert");
+			case 1:
+				return ok("Successful revert");
+			default: 
+				return ok("ok");
 			}
 		} catch (LibvirtException e) {
+			e.printStackTrace();
+			return internalServerError("Oops unable to start");
+		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Opps unable to revert");
-		}
+			return internalServerError("Oops database server connectivity.");
+		}   
+		
 	}
 }        
