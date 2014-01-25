@@ -1,4 +1,40 @@
+/****************************************** TODO *************************************
+1. suppress multiple selection while on summary tab.
+2. make the vm list table mulit-selectable. ( use CTRL for multi-select ).
+3. add identification tags to each listed vm.
+4. add status to the vm listing. ( add more columns to the listing table ).
+5. add tooltips where necessary.
+6. get host name from backend.
+7. start off with dynamic listing.
+**************************************************************************************/
+
 var hostName = [];
+
+/****************************************** button event handlers ******************************/
+
+$(".icons").click( function ( event ) {
+        $(".icons-select").removeClass("icons-select");
+        $( this ).addClass("icons-select");
+});
+
+$(".fa-refresh").on("click", function( event ) {
+    var tab = $("#inner-content").tabs("option", "active");
+    
+    switch ( tab ){
+            case 0 : //summary refresh
+                removeSummary();
+                hostName.forEach( getHostInfo );
+                break;
+            case 1 : //static listing refresh
+                removeStaticList();
+                hostName.forEach( getStaticList );
+                break;
+            case 3 : //network refresh
+                break;
+            case 4 : //monitoring refresh
+    }
+    
+});
 
 /****************************************** remove functions ***********************************/
 
@@ -65,14 +101,18 @@ $("#selectable").selectable({
 
 /*************************** Add the tabbing event handlers here********************************/
 $("#inner-content").tabs({
+    active: 0,
     activate: function( event, ui ) {
-        var newStr = $(ui.newTab).text(), oldStr = $(ui.oldTab).text();
-        
+        var newStr = $(ui.newTab).children("a").text(), oldStr = $(ui.oldTab).children("a").text();
+        /*************** the text based method used above is buggy find a better one **********************/
+        $(ui.newTab).addClass("tab-select");
+        $(ui.oldTab).removeClass("tab-select");
+
         if(newStr == "Summary") hostName.forEach( getHostInfo );
         if(oldStr == "Summary") removeSummary();
         if(newStr == "Static Listing") hostName.forEach( getStaticList );
         if(oldStr == "Static Listing") removeStaticList();
-    }
+    },
 });
 
 /***************************** get sidebar host list **********************************************/
