@@ -60,7 +60,7 @@ public class Application extends Controller {
 				jso=Json.newObject();
 				jso.put("ID",vm.getID());
 				jso.put("Name",vm.getName());
-				//	jso.put("Host",vm.getConnect().getHostName());
+				//jso.put("Host",vm.getConnect().getHostName());
 				jso.put("NoOfCPU",vm.getInfo().nrVirtCpu);
 				jso.put("MaxMemory",vm.getMaxMemory());
 				
@@ -200,7 +200,7 @@ public class Application extends Controller {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Database connection error");
+			return internalServerError("Database connection error : "+ e.getMessage());
 		}		
 	}
 		

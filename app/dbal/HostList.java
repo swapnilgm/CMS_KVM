@@ -25,7 +25,7 @@ public class HostList extends TimerTask {
 		int TIMEOUT=1000;    		
 		String hostIP;
 		Connect conn;
-		Connection dbConn;
+		Connection dbConn=null;
 		PreparedStatement pstmt;
 		Statement stmt;
 		ResultSet rs;
@@ -47,7 +47,8 @@ public class HostList extends TimerTask {
 		}
 		while(true){
 			try {
-				dbConn = DB.getConnection();
+				if(dbConn==null)
+					dbConn = DB.getConnection();
 				stmt=dbConn.createStatement();
 				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
 				for (int i=1;i<255;i++) {

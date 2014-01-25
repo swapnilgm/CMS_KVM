@@ -106,6 +106,7 @@ public class VM {
 			String to=new String(); 
 			Host tempHost=new Host(hostName);
 			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			//need modifiaction to be done after storage
 			tempHost.close();
 			if(vm==null){
 				return -1;	//("No vm "+vmName+" found on host"+hostName+".");
