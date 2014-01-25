@@ -13,6 +13,7 @@ public class VM {
 	public int start(String vmName, String hostName) throws LibvirtException, SQLException {
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;		//notFound("No vm "+vmName+" found on host"+hostName+".");
 		}
@@ -27,6 +28,7 @@ public class VM {
 	public int shutdown(String vmName, String hostName) throws LibvirtException, SQLException {
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;		//notFound("No vm "+vmName+" found on host"+hostName+".");
 		}
@@ -41,6 +43,7 @@ public class VM {
 	public int reboot(String vmName,String hostName) throws LibvirtException, SQLException {
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
@@ -54,6 +57,7 @@ public class VM {
 	public int destroy(String vmName, String hostName) throws LibvirtException, SQLException {
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");		
 		}
@@ -65,6 +69,7 @@ public class VM {
 	public int suspend(String vmName, String hostName) throws LibvirtException, SQLException{
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null)
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		if(vm.isActive()==1){
@@ -77,6 +82,7 @@ public class VM {
 	public int resume(String vmName, String hostName) throws LibvirtException, SQLException{
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
@@ -87,9 +93,11 @@ public class VM {
 	public int delete(String vmName, String hostName) throws LibvirtException, SQLException {
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
+		vm.destroy();
 		vm.undefine(3);
 		return 1;	//("deleted");
 	}
@@ -98,6 +106,7 @@ public class VM {
 			String to=new String(); 
 			Host tempHost=new Host(hostName);
 			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			tempHost.close();
 			if(vm==null){
 				return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 			}
@@ -120,6 +129,7 @@ public class VM {
 		xmlDesc=xmlDesc.concat("</domainsnapshot>");
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
 		if(vm==null)
 			return -1;	//vm not found
 		DomainSnapshot vmSnap=vm.snapshotCreateXML(xmlDesc);
@@ -134,6 +144,7 @@ public class VM {
 	public int revert(String vmName, String hostName, String snapshot) throws LibvirtException, SQLException{
 			Host tempHost=new Host(hostName);
 			Domain vm=tempHost.conn.domainLookupByName(vmName);
+			tempHost.close();
 			if(vm==null){
 				return -1;		//not found
 			}

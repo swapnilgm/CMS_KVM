@@ -35,11 +35,11 @@ public class HostList extends TimerTask {
 			stmt=DB.getConnection().createStatement();
 			rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+local+"'");
 			if (rs.next()) {
-				if(rs.getInt("total")==0){
-					stmt.close();
+				if(rs.getInt("total")==0){					
 					stmt.executeUpdate("INSERT INTO Host VALUES('"+local+"','"+local+"')");
 				}
 			}
+			rs.close();
 			stmt.close();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
@@ -50,7 +50,7 @@ public class HostList extends TimerTask {
 				dbConn = DB.getConnection();
 				stmt=dbConn.createStatement();
 				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
-				for (int i=82;i<144;i++) {
+				for (int i=1;i<255;i++) {
 					hostIP=subnet + "." + i;
 					rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
 					if (rs.next()) {

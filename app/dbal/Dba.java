@@ -24,7 +24,6 @@ public class Dba {
 		if(rs.next()){
 			hostIP=rs.getString("hostIP");
 			rs.close();
-			stmt.close();
 			return hostIP;
 		}else{		
 			rs.close();
@@ -32,7 +31,7 @@ public class Dba {
 		}			
 	}
 	
-	public ArrayList<String> getHostList() throws SQLException  {
+	public synchronized ArrayList<String> getHostList() throws SQLException  {
 		
 		ArrayList<String> hostList;
 		stmt=dbConn.createStatement();
@@ -50,11 +49,14 @@ public class Dba {
 		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostName = '"+hostName+"'");
 		if(rs.next()) {
 			if(rs.getInt("total")!=0) {
+				rs.close();
 				return true;
 			}else {
+				rs.close();
 				return false;
 			}
 		}
+		rs.close();
 		return false;					
 	}
 	

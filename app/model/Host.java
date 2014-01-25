@@ -26,7 +26,6 @@ public class Host {
 		hostIP=d.getIP(hostName);
 		d.close();
       ConnectAuth ca= new ConnectAuthDefault();
-      System.out.println("Connecting to qemu+tcp://" + hostIP + "/system ...");
       conn=new Connect("qemu+tcp://" + hostIP + "/system",ca,0); //connecting to hypervisor 
     }
 	
@@ -46,7 +45,8 @@ public class Host {
 	public JsonNode getHostInfo() throws LibvirtException
     {
 		JsonNode js=Json.toJson(this.conn.nodeInfo());
-		return js; 
+		return js;
+		
     }
 	
 	public boolean validVMName(String vmName) throws LibvirtException {
@@ -137,10 +137,10 @@ public class Host {
     	      "</disk>");
       
       break;
-      case "network": xml=xml.concat("<disk type='net'>");
+      /*case "network": xml=xml.concat("<disk type='net'>");
 	
       break;
-
+*/
 
 	default:
 		break;
@@ -180,7 +180,7 @@ public class Host {
         <name>virtimages</name>
         <source>
           <host name="192.168.43.89:3260"/>
-          <device path="iqn.2014-01.com.cmskvm:storage-server/images"/>
+          <device path="iqn.2014-01.com.cmskvm:storage-server"/>
           <auth type='chap' username='CMS_KVM_ST'>
             <secret usage='libvirtiscsi'/>
           </auth>
@@ -203,6 +203,7 @@ public class Host {
 	  			tempHost=new Host(hostName);
 	  			vmList.addAll(tempHost.listVM(filter));
 	  			tempHost.close();
+	  			tempHost=null;
 	  		}catch(LibvirtException e){
 	  			System.out.println(e.getMessage());
 	  		}

@@ -39,6 +39,7 @@ public class VMStatus extends TimerTask{
 					for( Domain vm : vmList) {
 						try {
 							vmInfo = vm.getInfo();
+							System.out.println("getting status of vm : "+ vm.getName() +"");
 							percpu = vmInfo.cpuTime*100;
 							permem = vmInfo.memory*100/vmInfo.maxMem;
 							inprepstmt.setString(1,vm.getUUIDString());
@@ -85,6 +86,8 @@ public class VMStatus extends TimerTask{
 			state[index]=rs.getString("state");				
 		}
 		rs.close();
+		pstmt.close();
+		dbConn.close();
 		jso=Json.newObject();
 		jso.put("Name",rs.getFloat("cpu"));
 		jso.put("memory",rs.getFloat("memory"));

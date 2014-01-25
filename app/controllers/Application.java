@@ -67,7 +67,7 @@ public class Application extends Controller {
 				jsolist.add(jso);
 				jso=null;
 			}
-			
+			response().setContentType("application/json");
 			return ok(Json.toJson(jsolist));		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
@@ -169,6 +169,7 @@ public class Application extends Controller {
 			tempHost = new Host(hostName);
 			JsonNode js=tempHost.getHostInfo();
 			tempHost.close();
+			response().setContentType("application/json");
 			return ok(js);		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
@@ -190,6 +191,7 @@ public class Application extends Controller {
 			tempHost = new Host(hostName);
 			JsonNode js=tempHost.getRuntimeVMStatus();
 			tempHost.close();
+			response().setContentType("application/json");
 			return ok(js);		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
