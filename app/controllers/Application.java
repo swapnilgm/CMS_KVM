@@ -118,28 +118,27 @@ public class Application extends Controller {
 		} 
 		JsonNode json=request().body().asJson();
 		if(json == null) {
+			System.out.println("Expecting Json data");
 			return badRequest("Expecting Json data");
 		} else {
 			String vmName = json.findPath("vmName").textValue();
 			if(vmName == null) {
-				
+				System.out.println("Expecting vmnam data");	
 				return badRequest("Missing parameter [vmName]");
 			} else {
 				int vcpu = json.findPath("vcpu").intValue();
 				if(vcpu == 0) {
-					
+					System.out.println("Expecting vcpu data");
 					return badRequest("Missing parameter [vcpu]");
 				} else {
-					
 					int memory = json.findPath("memory").intValue();
 					if(memory == 0) {
-						
+						System.out.println("Expecting memorydata");
 						return badRequest("Missing parameter [memory]");
 					} else {
-						
 						String bootType = json.findPath("bootType").textValue();
 						if(bootType == null) {
-							
+							System.out.println("Expecting Json data");
 							return badRequest("Missing parameter [bootType]");
 						} else {
 							

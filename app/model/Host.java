@@ -131,16 +131,33 @@ public class Host {
     		  "</disk>");
 	
       break;
-      case "hd": xml=xml.concat("<disk type='file' device='disk'>"+
+      case "hd": xml=xml.concat("<disk type='volume' device='disk'>"+
+    		  "<driver name='qemu' type='raw'/>"+
+    		  "<source pool='iscsi' volume='unit:0:0:1' />"+
+    		  "<target dev='vda' bus='virtio'/>"+
+       		  "</disk>");
+    	  
+    	  /*xml=xml.concat("<disk type='volume' device='disk'>"+
     		  "<source file='"+json.findPath("disk").asText()+"/>"+
     		  "<target dev='hda'/>"+
-    	      "</disk>");
+    	      "</disk>");*/
       
       break;
-      /*case "network": xml=xml.concat("<disk type='net'>");
-	
+      case "network": xml=xml.concat("<disk type='network' device='cdrom'>"+
+    		  "<source protocol='iscsi' name='iqn.2014-01.com.cmskvm:storage-server/1'>"+
+    		  "<host name='192.168.43.89' port='3260'/>"+
+    		  "</source>"+
+    		  "<target dev='hdc'/>"+
+    		  "<readonly/>"+
+    		  "</disk>");
+      
       break;
-*/
+      case "volume": xml=xml.concat("<disk type='volume' device='disk'>"+
+    		  "<source pool='aslk' volume='unit:0:0:1' mode='direct'/>"+
+    		  "<target dev='vda' bus='virtio'/>"+
+       		  "</disk>");
+      
+      break;
 
 	default:
 		break;
@@ -151,8 +168,8 @@ public class Host {
     		  "</interface>"+
     		  "<input type='mouse' />"+
     		  "<graphics type='vnc' port='-1' autoport='yes'/>"+
-    		  "</domain>"+
-    		  "</devices>");
+    		  "</devices>"+
+    		  "</domain>");
       
 	    try {
 	    	if(json.findPath("persistant").asText().compareTo("Persistent")==0){
@@ -175,23 +192,80 @@ public class Host {
 		}
         
     }
-   /* public  ArrayList<Domain> createStoragePool() {
-    	<pool type="iscsi">
-        <name>virtimages</name>
-        <source>
-          <host name="192.168.43.89:3260"/>
-          <device path="iqn.2014-01.com.cmskvm:storage-server"/>
-          <auth type='chap' username='CMS_KVM_ST'>
-            <secret usage='libvirtiscsi'/>
-          </auth>
-        </source>
-        <target>
-          <path>/dev/sdb1</path>
-        </target>
-      </pool>
-    	return TODO;
+    
+    public  int createStoragePool(JsonNode json) throws LibvirtException {
+    	String xmldesc=new String();
+    	String poolName=json.findPath("poolName").asText();
+    	String hostName=json.findPath("hostName").asText();
+    	String devicePath=json.findPath("devPath").asText();
+    	xmldesc=xmldesc.concat("<pool type=iscsi>"
+    			+ "<name>"+poolName+"</name>"
+    			+"<source>"
+    			+"<host name="+hostName+"/>"
+    			+"<device path="+devicePath+"/>"         
+    			+"</source>"
+    			+"<target>"
+    			+"<path>/dev/disk/by-path</path>"
+    			+"</target>"
+    			+"</pool>");
+    	StoragePool stp=conn.storagePoolDefineXML(xmldesc, 0);
+    	if(stp==null){    		
+    		return -1;
+    	} else {
+    		stp.create(0);
+    		stp.free();
+    		return 1;
+    	}
+    }    	
+    
+    public void deleteStoragePool(String poolName) throws LibvirtException {
+    	StoragePool stp=conn.storagePoolLookupByName(poolName);
+    	stp.delete(0);
+    	stp.free();
+    	return;
     }
-*/
+    
+    public String[] listStoragePool(int filter) throws LibvirtException {
+    	String [] stpListActive;
+    	String [] stpListInactive;
+    	String [] stpList=null;
+    	
+    	switch(filter) {
+    	case 0:
+    		stpListActive=conn.listStoragePools();
+    		return stpListActive;
+    	case 1:
+    		stpListInactive=conn.listDefinedDomains();
+    		return stpListInactive;
+    	case 2:
+    		stpListActive=conn.listStoragePools();
+    		stpListInactive=conn.listDefinedDomains();
+    		stpList=new String[(stpListActive.length+stpListInactive.length)];
+    		int index=0;
+    		for(int i=0;i<stpListActive.length;i++,index++) {
+    			stpList[index]=stpListActive[i];
+    		}    	   	   		
+    		for(int i=0;i<stpListInactive.length;i++,index++) {
+    			stpList[index]=stpListInactive[i];
+    		}
+    		return stpList;
+    	default : return null;
+    	}
+    	
+    }
+    
+    
+    public String[] listStorageVol(String poolName) throws LibvirtException {
+    	StoragePool stp=conn.storagePoolLookupByName(poolName);
+    	if(stp==null)
+    		return null;	//pool not found
+    	
+    	String [] stvList=stp.listVolumes();
+    	stp.free();
+    	return stvList;
+    }
+    
+
 	public synchronized static ArrayList<Domain> staticListAllVM(int filter) throws LibvirtException, SQLException {
 		Host tempHost;
 		Dba db=new Dba();

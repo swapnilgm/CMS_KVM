@@ -97,7 +97,8 @@ public class VM {
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
-		vm.destroy();
+		if(vm.isActive()>0)
+			vm.destroy();
 		vm.undefine(3);
 		return 1;	//("deleted");
 	}
