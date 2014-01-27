@@ -6,9 +6,48 @@
 5. add tooltips where necessary.
 6. get host name from backend.
 7. start off with dynamic listing.
+8. add event handler for sidebar generation.
+9. units to be added for props.
 **************************************************************************************/
 
 var hostName = [];
+var newTabFunctions = {
+    'tab-1' : /* function */
+        function() {
+            hostName.forEach( getHostInfo );
+        },
+    'tab-2' : /* function */
+        function() {
+            hostName.forEach( getStaticList );
+        },
+    'tab-3' : /* function */
+        function() {
+            console.log("new tab-3");
+        },
+    'tab-4' : /* function */
+        function() {
+            console.log("new tab-4");
+    }
+};
+
+var oldTabFunctions = {
+    'tab-1' : /* function */
+        function() {
+            removeSummary();
+        },
+    'tab-2' : /* function */
+        function() {
+            removeStaticList();
+        },
+    'tab-3' : /* function */
+        function() {
+            console.log("old tab-3");
+        },
+    'tab-4' : /* function */
+        function() {
+            console.log("old tab-4");
+        }
+};
 
 /****************************************** button event handlers ******************************/
 
@@ -56,7 +95,7 @@ function getHostInfo( elem ) {
         }
         
         $("#summary table tr").each( function () {
-            $( this ).append("<td class=\"values\">" + resp[propList.shift()] + "</td");
+            $( this ).append("<td class=\"values\">" + resp[propList.shift()] + "</td>");
         });
     });
 };
@@ -103,15 +142,15 @@ $("#selectable").selectable({
 $("#inner-content").tabs({
     active: 0,
     activate: function( event, ui ) {
-        var newStr = $(ui.newTab).children("a").text(), oldStr = $(ui.oldTab).children("a").text();
-        /*************** the text based method used above is buggy find a better one **********************/
+        var newTab = $(ui.newTab).attr("id"), oldTab = $(ui.oldTab).attr("id");
         $(ui.newTab).addClass("tab-select");
         $(ui.oldTab).removeClass("tab-select");
-
-        if(newStr == "Summary") hostName.forEach( getHostInfo );
-        if(oldStr == "Summary") removeSummary();
-        if(newStr == "Static Listing") hostName.forEach( getStaticList );
-        if(oldStr == "Static Listing") removeStaticList();
+        
+        if( newTabFunctions[newTab] )
+            newTabFunctions[newTab]();
+        
+        if( oldTabFunctions[oldTab] )
+            oldTabFunctions[oldTab]();
     },
 });
 
