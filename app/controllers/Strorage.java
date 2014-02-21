@@ -85,7 +85,7 @@ public class Strorage extends Controller{
 		}
 	}
 	
-	public static Result ListStoragePool(String hostName,int filter)
+	public static Result listStoragePool(String hostName,int filter)
 	{
 		try {
 			Host tempHost = new Host(hostName);
@@ -104,7 +104,7 @@ public class Strorage extends Controller{
 	}
 	
 	
-	public static Result ListStorageVol(String hostName,String poolName)
+	public static Result listStorageVol(String hostName,String poolName)
 	{
 		try {
 			Host tempHost = new Host(hostName);

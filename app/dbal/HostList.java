@@ -21,7 +21,7 @@ public class HostList extends TimerTask {
 	public static String subnet;
 	
 	public void run() {
-		//to probe the network and load list of hodt with hyperviso in database.
+		//to probe the network and load list of host with hypervisor in database.
 		int TIMEOUT=1000;    		
 		String hostIP;
 		Connect conn;
@@ -51,8 +51,9 @@ public class HostList extends TimerTask {
 					dbConn = DB.getConnection();
 				stmt=dbConn.createStatement();
 				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
-				for (int i=1;i<255;i++) {
+				for (int i=1;i<150;i++) {
 					hostIP=subnet + "." + i;
+					
 					rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
 					if (rs.next()) {
 						found=rs.getBoolean("total");

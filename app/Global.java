@@ -14,13 +14,13 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
 		initDB();
 		//get subnet
-		HostList.subnet="192.168.43";
+		HostList.subnet="10.42.0";
 		Timer nwHostProber=new Timer(true);
 		nwHostProber.schedule(new HostList(), 10);
 		//Timer nwVMProber=new Timer(true);
 		//nwVMProber.schedule(new VMStatus(), 1000,1000);
 		//new Thread(new HostList()).start();
-		new Thread(new VMStatus()).start();
+	new Thread(new VMStatus()).start();
 		
 	}
 	

@@ -35,5 +35,11 @@ GET  /list/dynamic/:hostName		controllers.Application.getDynamicList(hostName : 
 #createintg vm
 POST  /create/:hostName			controllers.Application.createVM(hostName : String)
 POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
+#storage
+GET /list/storage/pool/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
+GET /list/storage/vol/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
+#GET /list/storage/pool/create/:hostName		controllers.Strorage.createStoragePool()
+GET /list/storage/pool/delete/:hostName		controllers.Strorage.deleteStoragePool(hostName : String, poolName : String )
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

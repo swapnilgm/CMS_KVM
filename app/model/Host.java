@@ -19,8 +19,8 @@ public class Host {
 	//private String hostIP;
 	//private string hostName;
 	
-	public Host(String hostName) throws LibvirtException, SQLException
-    {
+	public Host(String hostName) throws LibvirtException, SQLException  {
+		
 		String hostIP=null;
 		Dba d=new Dba();
 		hostIP=d.getIP(hostName);
@@ -29,8 +29,8 @@ public class Host {
       conn=new Connect("qemu+tcp://" + hostIP + "/system",ca,0); //connecting to hypervisor 
     }
 	
-	public void close() throws LibvirtException
-	{
+	public void close() throws LibvirtException	{
+		
 		if(conn!=null)
 			conn.close();		
 	}
