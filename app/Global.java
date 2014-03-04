@@ -14,13 +14,13 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
 		initDB();
 		//get subnet
-		HostList.subnet="10.42.0";
+//		HostList.subnet="10.42.0";
 		Timer nwHostProber=new Timer(true);
-		nwHostProber.schedule(new HostList(), 10);
+		nwHostProber.schedule(new HostList(), 1000);
 		//Timer nwVMProber=new Timer(true);
-		//nwVMProber.schedule(new VMStatus(), 1000,1000);
+	//	nwVMProber.schedule(new VMStatus(), 1000);
 		//new Thread(new HostList()).start();
-	new Thread(new VMStatus()).start();
+	//new Thread(new VMStatus()).start();
 		
 	}
 	
@@ -50,8 +50,9 @@ public class Global extends GlobalSettings {
 					"(vmuuid VARCHAR(255) NOT NULL, " +
 					" state VARCHAR(255) NOT NULL, "+
 					" cpu DECIMAL(5,2) NOT NULL, "+
-					" memory DECIMAL(5,2) NOT NULL "+
-					") WITH OIDS";  
+					" memory DECIMAL(5,2) NOT NULL, "+
+					" time DATETIME NOT NULL)";
+//					") WITH OIDS";  
 			if((stmt.executeUpdate(sql))<0)
 				System.out.println("Created vmSaveSnapshot table in given database...");
 			stmt.close();

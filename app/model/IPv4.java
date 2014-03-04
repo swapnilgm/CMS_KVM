@@ -20,7 +20,9 @@ public class IPv4 {
 
         String symbolicIP = st[0];
         String symbolicCIDR = st[1];
-
+        System.out.println("IP :: "+ symbolicIP);
+        System.out.println("IP :: "+ symbolicCIDR);
+        
         Integer numericCIDR = new Integer(symbolicCIDR);
         if (numericCIDR > 32)
             throw new NumberFormatException("CIDR can not be greater than 32");
@@ -71,12 +73,12 @@ public class IPv4 {
 
 
 /**
-* Get an arry of all the IP addresses available for the IP and netmask/CIDR
+* Get an array of all the IP addresses available for the IP and netmask/CIDR
 * given at initialization
 *
 *@return
 */
-    public List<String> getAvailableIPs(Integer numberofIPs) {
+    public List<String> getAvailableIPs() {
 
         ArrayList<String> result = new ArrayList<String>();
         int numberOfBits;
@@ -97,7 +99,7 @@ public class IPv4 {
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
 
-        for (int i = 1; i < (numberOfIPs) && i < numberofIPs; i++) {
+        for (int i = 1; i < (numberOfIPs); i++) {
 
             Integer ourIP = baseIP + i;
 

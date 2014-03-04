@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 import org.libvirt.Domain;
 import org.libvirt.DomainInfo;
@@ -19,7 +20,7 @@ import model.Host;
 import play.db.DB;
 import play.libs.Json;
 
-public class VMStatus extends Thread {
+public class VMStatus extends TimerTask {
 	static Connection dbConn=DB.getConnection();
 	
 	
@@ -42,7 +43,7 @@ public class VMStatus extends Thread {
 			Dba db=new Dba();
 			inprepstmt = dbConn.prepareStatement("INSERT INTO VM VALUES(?,?,?,?)");
 			delprepstmt = dbConn.prepareStatement("DELETE FROM VM WHERE OID IN "+
-					"(SELECT OID FROM VM WHERE vmuuid = ? ORDER BY OID DESC OFFSET 35)");
+					"(SELECT OID FROM VM WHERE vmuuid = ? ORDER BY TIME DESC OFFSET 35)");
 			//missing case for deleting inactive vm listho
 			while(true) {
 				hostList=db.getHostList();
@@ -57,7 +58,7 @@ public class VMStatus extends Thread {
 								vmInfoSample1 = vm.getInfo();
 								cpuTimeSample1=System.nanoTime();
 								try {
-									sleep(500);
+									Thread.sleep(500);
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

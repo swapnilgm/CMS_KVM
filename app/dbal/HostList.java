@@ -1,6 +1,7 @@
 
 package dbal;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.Connection;
@@ -8,13 +9,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.Properties;
 import java.util.TimerTask;
+
+import model.IPv4;
 
 import org.libvirt.Connect;
 import org.libvirt.ConnectAuth;
 import org.libvirt.ConnectAuthDefault;
 import org.libvirt.LibvirtException;
 
+import play.Play;
 import play.db.DB;
 
 public class HostList extends TimerTask {
@@ -23,14 +29,27 @@ public class HostList extends TimerTask {
 	public void run() {
 		//to probe the network and load list of host with hypervisor in database.
 		int TIMEOUT=1000;    		
-		String hostIP;
 		Connect conn;
 		Connection dbConn=null;
 		PreparedStatement pstmt;
 		Statement stmt;
 		ResultSet rs;
 		boolean found;
-		String local=new String("localhost");
+		Properties defaultProps = new Properties();
+		FileInputStream in;
+		
+		try {
+			in = new FileInputStream(Play.application().getFile("/conf/datacenter.conf"));
+			defaultProps.load(in);
+			in.close();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		subnet=defaultProps.getProperty("subnet");
+		IPv4 net=new IPv4(subnet);
+		/*String local=new String("localhost");
 		try {
 			stmt=DB.getConnection().createStatement();
 			rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+local+"'");
@@ -44,15 +63,16 @@ public class HostList extends TimerTask {
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
+		List<String> compList=net.getAvailableIPs();
 		while(true){
 			try {
 				if(dbConn==null)
 					dbConn = DB.getConnection();
 				stmt=dbConn.createStatement();
 				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
-				for (int i=1;i<150;i++) {
-					hostIP=subnet + "." + i;
+				for (String hostIP : compList) {
+					//hostIP=subnet + "." + i;
 					
 					rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
 					if (rs.next()) {
