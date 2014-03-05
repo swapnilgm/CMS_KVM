@@ -6,40 +6,40 @@
 GET     /                           controllers.Application.index()
 
 
-GET     /list/static/:hostName    	controllers.Application.getStaticList(hostName : String, filter : Int )
+GET     /vm/list/configuration/:hostName    	controllers.Application.getStaticList(hostName : String, filter : Int )
 #param hostName ---all >lis all   --other-> host specific list
 #
 #
 #
-#GET     /list/dynamic/:hostName      controllers.Application.getDynamicList(hostName : String)
-GET		/list/host					controllers.Application.getHostList()
+GET     /vm/list/runtime/:hostName      controllers.Application.getDynamicList(hostName : String)
+GET		/host/list					controllers.Application.getHostList()
 
 #start vm
-GET	 /list/dynamic/start		controllers.VMOperation.start(vmName : String, hostName : String)
+GET	 /vm/start		controllers.VMOperation.start(vmName : String, hostName : String)
 #send shutdown signal to vm
-GET	 /list/dynamic/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
+GET	 /vm/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
 #host summary
-GET  /hostinfo/:hostName		controllers.Application.hostInfo(hostName : String)
+GET  /host/info/:hostName		controllers.Application.hostInfo(hostName : String)
 #reboot host
-GET	 /list/dynamic/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
+GET	 /vm/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
 #pause vm
-GET	 /list/dynamic/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
+GET	 /vm/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
 #resume vm
-GET	 /list/dynamic/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
+GET	 /vm/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
 #power off signal
-GET	 /list/dynamic/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
+GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
 #delete signal
-GET	 /list/dynamic/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
+GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 #dynamic usages
-GET  /list/dynamic/:hostName		controllers.Application.getDynamicList(hostName : String)
+GET  /vm/:hostName		controllers.Application.getDynamicList(hostName : String)
 #createintg vm
 POST  /create/:hostName			controllers.Application.createVM(hostName : String)
 POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
 #storage
-GET /list/storage/pool/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
-GET /list/storage/vol/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
-#GET /list/storage/pool/create/:hostName		controllers.Strorage.createStoragePool()
-GET /list/storage/pool/delete/:hostName		controllers.Strorage.deleteStoragePool(hostName : String, poolName : String )
+GET /storage/pool/list/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
+GET /storage/vol/list/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
+#GET /storage/pool/create/:hostName		controllers.Strorage.createStoragePool()
+GET /storage/pool/delete/:hostName		controllers.Strorage.deleteStoragePool(hostName : String, poolName : String )
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

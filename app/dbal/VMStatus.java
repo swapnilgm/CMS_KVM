@@ -43,7 +43,7 @@ public class VMStatus extends TimerTask {
 			Dba db=new Dba();
 			inprepstmt = dbConn.prepareStatement("INSERT INTO VM VALUES(?,?,?,?)");
 			delprepstmt = dbConn.prepareStatement("DELETE FROM VM WHERE OID IN "+
-					"(SELECT OID FROM VM WHERE vmuuid = ? ORDER BY TIME DESC OFFSET 35)");
+					"(SELECT OID FROM VM WHERE vmuuid = ? ORDER BY OID DESC OFFSET 35)");
 			//missing case for deleting inactive vm listho
 			while(true) {
 				hostList=db.getHostList();
@@ -67,14 +67,8 @@ public class VMStatus extends TimerTask {
 								cpuTimeSample2=System.nanoTime();
 								cpuTimeNodeDiff=cpuTimeSample2-cpuTimeSample1;
 								cpuTImeVMdiff=vmInfoSample2.cpuTime-vmInfoSample1.cpuTime;
-								//System.out.println("vm diff"+cpuTImeVMdiff);
-								//System.out.println("node diff"+cpuTimeNodeDiff);
 								percpu=(100*cpuTImeVMdiff)/(cpuTimeNodeDiff*cores);
-								//System.out.println("getting status of vm : "+ vm.getName() +"");
-								//System.out.println("getting status of vmcpu : "+ percpu +"");
 								permem = vmInfoSample2.memory*100/vmInfoSample2.maxMem;
-								//System.out.println("getting status of vmmemory : "+ permem +"");
-							
 								inprepstmt.setString(1,vm.getUUIDString());
 								inprepstmt.setString(2,vmInfoSample2.state.toString());
 								inprepstmt.setBigDecimal(3,new BigDecimal(percpu).setScale(2));

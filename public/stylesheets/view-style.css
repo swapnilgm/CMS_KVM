@@ -2,70 +2,170 @@
 @import url("pure-min.css");
 @import url("Font-Awesome/css/font-awesome.css");
 
+#static-list table.inner-table > tbody > tr:hover {
+    background-color: #dd9999;
+}
+
+.fa-github:hover {
+    cursor: pointer;
+}
+
+.tab-area {
+    position: relative;
+    background-color: rgb( 200, 130, 130);
+    height: 50px;
+}
+
+.tab-text {
+    color: black;
+    text-decoration: none;
+}
+
+.tab {
+    display: inline-block;
+    padding: 8px 11px;
+    border: 2px transparent #ddd;
+    border-radius: 8px;
+}
+
+.tab:hover,
+.tab:active,
+.tab:focus,
+.tab-select {
+    cursor: pointer;
+    color: black;
+    background-color: rgb( 200, 120, 120);
+    box-shadow: inset 0px 0px 2px 2px rgba( 64, 64, 64, 0.8);
+}
+
+.tab-list {
+    vertical-align: bottom;
+    position: absolute;
+    top: -13px;
+    font-size: 120%;
+}
+
+.inner-table {
+    margin: 20px 40px;
+}
+
+.button-bar {
+    margin-left: 37px;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+#summary-list {
+    margin-left: 50px;
+    margin-top: 30px;
+}
+#feedback {
+    font-size: 120%;
+}
+
+#selectable .ui-selecting {
+    background: #ddaaaa;
+}
+
+#selectable .ui-selected {
+    background: #dd9999;
+    color: #222222;
+}
+
+#selectable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+}
+
+#selectable li {
+    margin: 3px;
+    padding: 0.4em;
+}
+
+.icons {
+    padding: 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+.icons:hover,
+.icons:focus {
+    cursor: pointer;
+    background-color: #bbb;
+}
+
+.icons:active,
+.icons-select {
+    background-color: #aaa;
+    box-shadow: inset 0px 0px 1px 2px #777;
+}
+
+.fa-play,
+.fa-plus {
+    color: rgb( 10, 220, 60);
+}
+
+.fa-pause {u   
+    color: rgb( 62, 153, 150);
+}
+
+.fa-refresh {
+    color: rgb( 40, 40, 190);
+}
+
+.fa-stop,
+.fa-times {
+    color: rgb( 250, 50, 50);
+}
+
 #top-bar {
     display: inline-block;
     background-color: silver;
     width: 100%;
 }
-
 #content {
-   display: inline-block;
+    display: inline-block;
     margin-top: 40px;
     width: 100%;
 }
-
 #sidebar {
+    background-color: silver;
     width: 200px;
     height: 400px;
-    float:left;
+    float: left;
     display: inline-block;
+    font-size: 120%;
 }
-
 #navbar {
     float: right;
     width: auto;
     background-color: inherit;
     padding: 10px;
 }
-
 #logo {
     background-color: silver;
     margin-left: 10px;
     padding: 10px;
 }
-
 #logo:hover {
     cursor: pointer;
 }
-
 #inner-content {
-    background-color: silver;
+    display: inline-block;
+    background-color: rgba( 220, 220, 220, 1.0);
     width: 1000px;
-    height: 400px;
     float: right;
 }
-
-#tab-bar {
-    width: inherit;
-}
-
-#button-bar {
-    width: inherit;
-}
-
 #git {
     padding: 13px;
-    color: rgba( 20, 20, 20, 0.8);
+    color: rgba(20, 20, 20, 0.8);
     vertical-align: top;
 }
-
 #git:hover {
-    color: #39bbbb;
+    color: #395;
 }
-
-#red {
-    color: red;
-}
-
 body {
     margin: 20px 30px;
+}

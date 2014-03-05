@@ -134,28 +134,7 @@ public class IPv4 {
         return x.longValue();
     }
 
-    private String getBinary(Integer number) {
-        String result = "";
-
-        Integer ourMaskBitPattern = 1;
-        for (int i = 1; i <= 32; i++) {
-
-            if ((number & ourMaskBitPattern) != 0) {
-
-                result = "1" + result; // the bit is 1
-            } else { // the bit is 0
-
-                result = "0" + result;
-            }
-            if ((i % 8) == 0 && i != 0 && i != 32)
-
-                result = "." + result;
-            ourMaskBitPattern = ourMaskBitPattern << 1;
-
-        }
-        return result;
-    }
-
+    
 /**
 * Checks if the given IP address contains in subnet
 *

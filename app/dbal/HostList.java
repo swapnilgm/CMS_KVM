@@ -82,6 +82,7 @@ public class HostList extends TimerTask {
 						found=false;
 					try {
 						if (InetAddress.getByName(hostIP).isReachable(TIMEOUT)){
+							//System.out.println("Connecting to libvirt on :: "+ hostIP);
 							String hostURI="qemu+tcp://"+hostIP+ "/system";
 							ConnectAuth ca= new ConnectAuthDefault();
 							conn=new Connect(hostURI,ca,0); //connecting to hypervisor		    

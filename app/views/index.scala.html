@@ -5,15 +5,15 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/view-style.css")" type="text/css">
-    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")">
-    </script>
+    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
     <title>View</title>
 </head>
 
 <body>
     <div id="top-bar">
-        <img src="@routes.Assets.at("images/cms(small).png")" id="logo">
-        <i class="fa fa-github fa-2x" id="git"></i>
+        <img src="@routes.Assets.at("images/cms.small.png")" id="logo">
+        <a href="http://github.com/ajinkya4649/CMS_KVM/" target="_blank"><i class="fa fa-github fa-2x" id="git"></i></a>
         <div class="pure-menu pure-menu-open pure-menu-horizontal" id="navbar">
             <ul>
                 <li>
@@ -32,68 +32,96 @@
         </div>
     </div>
     <div id="content">
-        <div class="pure-menu pure-menu-open" id="sidebar">
-            <ul>
-                <li>
-                    <a href="#">Host-1</a>
-                </li>
-                <li>
-                    <a href="#">Host-2</a>
-                </li>
-                <li>
-                    <a href="#">Host-3</a>
-                </li>
-                <li>
-                    <a href="#">Host-4</a>
-                </li>
-                <li>
-                    <a href="#">Host-5</a>
-                </li>
-                <li>
-                    <a href="#">Host-6</a>
-                </li>
-                <li>
-                    <a href="#">Host-7</a>
-                </li>
-            </ul>
+        <div id="sidebar">
+            <ol id="selectable" title="click to select (hold down CTRL for multi-select)">
+            </ol>
         </div>
         <div id="inner-content">
-            <div id="tab-bar">
-                <ul>
-                    <li class="pure-button">Summery</li>
-                    <li class="pure-button">Static Listing</li>
-                    <li class="pure-button">Network</li>
-                    <li class="pure-button">Monitoring</li>
+            <div class="tab-area">
+                <ul class="tab-list">
+                    <li class="tab" id="tab-1"><a class="tab-text" href="#summary" title="host summary">Summary</a></li>
+                    <li class="tab" id="tab-2"><a class="tab-text" href="#static-list" title="List all vm's of selected hosts">Static Listing</a></li>
+                    <li class="tab" id="tab-3"><a class="tab-text" href="#network" title="list networks">Network</a></li>
+                    <li class="tab" id="tab-4"><a class="tab-text" href="#monitoring" title="monitor vm's of selected hosts">Monitoring</a></li>
                 </ul>
             </div>
-            <div id="list-area">
-                <div id="button-bar">
-                    <ul>
-                        <li class="pure-button">
-                            <i class="fa fa-play fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-pause fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-times-circle fa-2x" id="red"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-plus fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-stop fa-2x"></i>
-                        </li>
-                        <li class="pure-button">
-                            <i class="fa fa-refresh fa-2x"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+             <div id="summary">
+                 <div class="button-bar">
+                         <i class="fa fa-refresh fa-2x icons"></i>
+                 </div>
+                 <table class="pure-table inner-table">
+                     <tbody>
+                         <tr>
+                             <td>Model</td>
+                         </tr>
+                         <tr>
+                             <td>Memory</td>
+                         </tr>
+                         <tr>
+                             <td>Cpus</td>
+                         </tr>
+                         <tr>
+                             <td>Speed</td>
+                         </tr>
+                         <tr>
+                             <td>Nodes</td>
+                         </tr>
+                         <tr>
+                             <td>Sockets</td>
+                         </tr>
+                         <tr>
+                             <td>Cores</td>
+                         </tr>
+                         <tr>
+                             <td>Threads</td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+             <div id="static-list">
+                 <div class="button-bar">
+                    <i class="fa fa-play fa-2x icons" title="play vm"></i>
+                    <i class="fa fa-pause fa-2x icons" title="pause vm"></i>
+                    <i class="fa fa-stop fa-2x icons" title="shutoff vm"></i>
+                    <i class="fa fa-refresh fa-2x icons" title="refresh list"></i>
+                    <i class="fa fa-times fa-2x icons" title="destroy vm"></i>
+                    <i class="fa fa-plus fa-2x icons" title="create vm"></i>
+                 </div>
+                 <table class="pure-table inner-table">
+                     <thead>
+                         <tr>
+                             <th>Id</th>
+                             <th>Name</th>
+                             <th>NoOfCpus</th>
+                             <th>MaxMemory</th>
+                         </tr>
+                     </thead>
+                     <tbody>  
+                     </tbody>
+                 </table>
+             </div>
+             <div id="network">
+                <div class="button-bar">
+                    <i class="fa fa-play fa-2x icons"></i>
+                    <i class="fa fa-pause fa-2x icons"></i>
+                    <i class="fa fa-stop fa-2x icons"></i>
+                    <i class="fa fa-refresh fa-2x icons"></i>
+                    <i class="fa fa-times fa-2x icons"></i>
+                    <i class="fa fa-plus fa-2x icons"></i>
+                 </div>
+             </div>
+             <div id="monitoring">
+                <div class="button-bar">
+                    <i class="fa fa-play fa-2x icons"></i>
+                    <i class="fa fa-pause fa-2x icons"></i>
+                    <i class="fa fa-stop fa-2x icons"></i>
+                    <i class="fa fa-refresh fa-2x icons"></i>
+                    <i class="fa fa-times fa-2x icons"></i>
+                    <i class="fa fa-plus fa-2x icons"></i>
+                 </div>
+             </div>
         </div>
     </div>
 </body>
-<script>
-</script>
-
+<script src="@routes.Assets.at("javascripts/view.js")"></script>
 </html>
