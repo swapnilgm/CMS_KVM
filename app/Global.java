@@ -17,7 +17,7 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
     	initDB();
     		//get subnet 
-    	new Thread(new LoadHostList("192.168.43")).start();
+    	new Thread(new LoadHostList("10.42.0")).start();
 			
 		
     }
@@ -55,7 +55,7 @@ public class Global extends GlobalSettings {
     				dbConn = DB.getConnection();
     				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
 
-    				for (int i=82;i<144;i++) {
+    				for (int i=1;i<100;i++) {
     					hostIP=subnet + "." + i;
     					    					   							
     					try {
