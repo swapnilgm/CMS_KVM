@@ -49,7 +49,7 @@ public class HostList extends TimerTask {
 		
 		subnet=defaultProps.getProperty("subnet");
 		IPv4 net=new IPv4(subnet);
-		/*String local=new String("localhost");
+		String local=new String("localhost");
 		try {
 			stmt=DB.getConnection().createStatement();
 			rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+local+"'");
@@ -63,7 +63,7 @@ public class HostList extends TimerTask {
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}*/
+		}
 		List<String> compList=net.getAvailableIPs();
 		while(true){
 			try {
