@@ -6,8 +6,8 @@ import org.libvirt.LibvirtException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import dbal.Dba;
 import model.Host;
-import play.db.DB;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
@@ -15,14 +15,8 @@ import views.html.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-import javax.sql.DataSource;
 
 public class Application extends Controller {
-
-	static ArrayList<String> hostList;
-	static DataSource ds= DB.getDataSource();
-	static Connection dbConn=null;
-	static Statement stmt=null;
 	
 	public static Result index()  {
 		return ok(index.render(""));
@@ -30,9 +24,11 @@ public class Application extends Controller {
 	
 	public static Result getHostList()  {
 		try{
-			ArrayList<String> hostList = Host.getHostList();
+			Dba db=new Dba();
+			ArrayList<String> hostList = db.getHostList();
+			db.close();
 			JsonNode json=Json.toJson(hostList);        		
-			//response().setContentType("application/json");
+			response().setContentType("application/json");
 			return ok(json);		  	
 			
 		} catch (SQLException e) {
@@ -51,43 +47,59 @@ public class Application extends Controller {
 				vmList=Host.staticListAllVM(filter);
 			}
 			else {
-				
+				if(!Host.ishostExist(hostName))
+					return notFound();
 				Host tempHost=new Host(hostName);
-				vmList=tempHost.staticListVM(filter);
+				vmList=tempHost.listVM(filter);
+				tempHost.close();
 			}
 			ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
-			ObjectNode jso=null;jso=Json.newObject();
+			ObjectNode jso=Json.newObject();
 			
 			for (Domain vm : vmList) {
 				jso=Json.newObject();
 				jso.put("ID",vm.getID());
 				jso.put("Name",vm.getName());
-				//	jso.put("Host",vm.getConnect().getHostName());
+				//jso.put("Host",vm.getConnect().getHostName());
 				jso.put("NoOfCPU",vm.getInfo().nrVirtCpu);
 				jso.put("MaxMemory",vm.getMaxMemory());
 				
 				jsolist.add(jso);
 				jso=null;
 			}
-			
+			response().setContentType("application/json");
 			return ok(Json.toJson(jsolist));		
-		} catch (LibvirtException | SQLException e) {
+		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return internalServerError("Oops getstaitc list");
+			return internalServerError("Oops unable to connect to host");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		}	            
 	}
 	
 	
 	public static Result validateVMName(String hostName,String vmName) {
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
 			Host tempHost=new Host(hostName);
-			if(tempHost.conn.domainLookupByName(vmName)!=null);
-			return ok();
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();
+				return ok("");
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return internalServerError("Oops, Connection to Host is lost");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		}       	
 	}        
 	
@@ -99,42 +111,45 @@ public class Application extends Controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return notFound("Cannot create Host connection");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
 		} 
 		JsonNode json=request().body().asJson();
 		if(json == null) {
+			System.out.println("Expecting Json data");
 			return badRequest("Expecting Json data");
 		} else {
 			String vmName = json.findPath("vmName").textValue();
 			if(vmName == null) {
-				
+				System.out.println("Expecting vmnam data");	
 				return badRequest("Missing parameter [vmName]");
 			} else {
 				int vcpu = json.findPath("vcpu").intValue();
 				if(vcpu == 0) {
-				
+					System.out.println("Expecting vcpu data");
 					return badRequest("Missing parameter [vcpu]");
 				} else {
-					
 					int memory = json.findPath("memory").intValue();
 					if(memory == 0) {
-						
+						System.out.println("Expecting memorydata");
 						return badRequest("Missing parameter [memory]");
 					} else {
-						
 						String bootType = json.findPath("bootType").textValue();
 						if(bootType == null) {
-							
+							System.out.println("Expecting Json data");
 							return badRequest("Missing parameter [bootType]");
 						} else {
 							
-							if(tempHost.create(json)==-1){
+							if(tempHost.createVM(json)==-1){
 								
 								return internalServerError("Server error");
-							}else if (tempHost.create(json)==0){
+							}else if (tempHost.createVM(json)==0){
 								
 								return badRequest("Cannot create vm");
 							}else {
-								return ok("vm created");
+								return created();
 							}
 							
 						}
@@ -148,30 +163,46 @@ public class Application extends Controller {
 		
 		Host tempHost;
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound();
 			tempHost = new Host(hostName);
-			
-			JsonNode js=Json.toJson(tempHost.conn.nodeInfo());
+			JsonNode js=tempHost.getHostInfo();
+			tempHost.close();
+			response().setContentType("application/json");
+			return ok(js);		
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
+	}
+	
+	public static Result getDynamicList(String hostName) {	
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound();
+			tempHost = new Host(hostName);
+			JsonNode js=tempHost.getRuntimeVMStatus();
+			tempHost.close();
+			response().setContentType("application/json");
 			return ok(js);		
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return notFound("Oops, Connection to Host is lost");
-		} 
-		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Database connection error : "+ e.getMessage());
+		}		
 	}
-	
-	public static Result getDynamicList(String hostURI, int filter) {
 		
-		//        ArrayList<Domain> vm = new Host(hostURI).dynamicListVM(filter);
-		//      if(vm == null)
-		//    	return ok("Connection Lost");
-		
-		
-		return TODO;
-		
-	}
-	
-	
 	public static Result refresh(String hostURI, int filter) throws LibvirtException {
 		return redirect(routes.Application.getStaticList(hostURI,filter));
 	}

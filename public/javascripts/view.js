@@ -2,7 +2,7 @@
 1. suppress multiple selection while on summary tab.
 2. make the vm list table mulit-selectable. ( use CTRL for multi-select ).
 3. add identification tags to each listed vm.
-4. add status to the vm listing. ( add more columns to the listing table ).
+4. add more columns to the listing table.
 5. add tooltips where necessary.
 6. get host name from backend.
 7. start off with dynamic listing.
@@ -49,30 +49,109 @@ var oldTabFunctions = {
         }
 };
 
-/****************************************** button event handlers ******************************/
+/************************************* button event handlers ******************************/
 
 $(".icons").click( function ( event ) {
         $(".icons-select").removeClass("icons-select");
         $( this ).addClass("icons-select");
 });
 
-$(".fa-refresh").on("click", function( event ) {
-    var tab = $("#inner-content").tabs("option", "active");
-    
-    switch ( tab ){
-            case 0 : //summary refresh
-                removeSummary();
-                hostName.forEach( getHostInfo );
-                break;
-            case 1 : //static listing refresh
-                removeStaticList();
-                hostName.forEach( getStaticList );
-                break;
-            case 3 : //network refresh
-                break;
-            case 4 : //monitoring refresh
-    }
-    
+/************************* sidebar refresh event handler ******************/
+$("#sidebar .fa-refresh").on("click", function( event ) {
+        $.getJSON("/host/list", function( json ) {
+            $("#selectable li").remove();
+            var i = 0;
+            var str = "";
+            while (json[i++]) {
+                str += "<li class=\"ui-widget-content\">" + json[i - 1] + "</li>";
+            }
+            $("#selectable").append(str);
+        });
+});
+
+/************************* summary refresh event handler *********************/
+$("#summary .fa-refresh").on("click", function( event ) {
+    removeSummary();
+    hostName.forEach( getHostInfo );
+});
+
+/************************** static list refresh event handler ****************/
+
+$("#static-list .fa-refresh").on("click", function( event ) {
+    removeStaticList();
+    hostName.forEach( getStaticList );
+});
+
+$("#static-list .fa-play").on("click", function( event ) {
+    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    $.ajax({
+        url: "/vm/start",
+        type: "GET",
+        data: { "vmName": vmName, "hostName" : hostName[0] },
+        dataType: 'text',
+        success: function (resp) {
+            console.log( resp );
+            $("#static-list .fa-refresh").triggerHandler("click");
+        },
+        error: function (xhr, status) {
+            alert("sorry there was a problem!");
+        }
+    });
+});
+
+$("#static-list .fa-times").on("click", function( event ) {
+    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    console.log(vmName);
+    $.ajax({
+        url: "/vm/delete",
+        type: "GET",
+        data: { "vmName" : vmName, "hostName" : hostName[0] },
+        dataType: "text",
+        success: function( resp ) {
+            console.log(resp);
+            $("#static-list .fa-refresh").triggerHandler("click");
+        },
+        error: function (xhr, status) {
+            alert("sorry there was a problem");
+        }
+    });
+    $("#inner-content .fa-refresh").trigger("click");
+});
+
+$("#static-list .fa-stop").on("click", function( event ) {
+    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    console.log(vmName);
+    $.ajax({
+        url: "/vm/shutdown",
+        type: "GET",
+        data: { "vmName" : vmName, "hostName" : hostName[0] },
+        dataType: "text",
+        success: function( resp ) {
+            console.log(resp);
+            $("#static-list .fa-refresh").triggerHandler("click");
+        },
+        error: function (xhr, status) {
+            alert("sorry there was a problem");
+        }
+    });
+});
+
+$("#static-list .fa-power-off").on("click", function( event ) {
+    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    console.log(vmName);
+    $.ajax({
+        url: "/vm/destroy",
+        type: "GET",
+        data: { "vmName" : vmName, "hostName" : hostName[0] },
+        dataType: "text",
+        success: function( resp ) {
+            console.log(resp);
+            $("#static-list .fa-refresh").triggerHandler("click");
+        },
+        error: function (xhr, status) {
+            alert("sorry there was a problem");
+        }
+    });
 });
 
 /****************************************** remove functions ***********************************/
@@ -87,7 +166,7 @@ function removeStaticList() {
 
 /******************************************** hostName functions *********************************/
 function getHostInfo( elem ) {
-    $.getJSON( "/hostinfo/" + elem, function( resp ) {
+    $.getJSON( "/host/info/" + elem, function( resp ) {
         var propList = [];
         
         for ( var prop in resp ) {
@@ -101,7 +180,7 @@ function getHostInfo( elem ) {
 };
 
 function getStaticList( elem ) {
-    $.getJSON("/list/static/" + elem + "?filter=2", function( resp ) {
+    $.getJSON("/vm/list/configuration/" + elem + "?filter=2", function( resp ) {
         var propList = [], str = "";
         
         for( var prop in resp[0] ) {
@@ -110,6 +189,7 @@ function getStaticList( elem ) {
         
         for( var i = 0; i < resp.length ; i++ ){
             str += "<tr>";
+            str += "<td>" + i + "</td>";
             for( var j = 0; j < propList.length ; j++ ) {
                     str += "<td>" + resp[i][propList[j]] + "</td>";
             }
@@ -156,7 +236,7 @@ $("#inner-content").tabs({
 
 /***************************** get sidebar host list **********************************************/
 $.ajax({
-    url: "/list/host",
+    url: "/host/list",
     type: "GET",
     dataType: 'json',
     success: function (json) {
@@ -173,3 +253,70 @@ $.ajax({
         alert("sorry there was a problem!");
     },
 });
+
+/**************************** VMs table selection ************************************************/
+
+$("#static-list table.inner-table > tbody").on("click", "tr", function( event ) {
+    console.log("row selected");
+    $(".vm-row-selected").removeClass("vm-row-selected");
+    $( this ).addClass("vm-row-selected");
+});
+
+/***************************** ajax event handlers *********************/
+
+$(document).ajaxStart( function( event ) {
+    console.log("ajax query start");
+});
+
+$(document).ajaxStop( function( event ) {
+    console.log("ajax query ends");
+});
+
+/******** note **********
+1. ajaxStart is triggered when an ajax query starts and it is not triggered for all until all the pending queries
+have been completed
+
+2. ajaxStop is triggered when no other ajax queries are pending
+
+3. ajaxSend is triggered when any ajax quey is about to be sent
+
+4. ajaxComplete is triggered when any ajax query reaches completion
+
+Google like footnotes to be implemented using this.
+**********************/
+
+/******************* monitoring **************************/
+$(function () {
+        $('#container').highcharts({
+            title: {
+                text: 'Monthly Average Temperature',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: WorldClimate.com',
+                x: -20
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                    text: 'Temperature (°C)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: '°C'
+            },
+           series: [{
+                name: 'Tokyo',
+                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+            }]
+        });
+    });
+    
