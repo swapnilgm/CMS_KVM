@@ -31,7 +31,7 @@ GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : St
 #delete signal
 GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 #dynamic usages
-GET  /vm/:hostName		controllers.Application.getDynamicList(hostName : String)
+#GET  /vm/:hostName		controllers.Application.getDynamicList(hostName : String)
 #createintg vm
 POST  /create/:hostName			controllers.Application.createVM(hostName : String)
 POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)

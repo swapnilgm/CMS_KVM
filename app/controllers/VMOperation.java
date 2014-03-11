@@ -27,7 +27,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to send shutdown signal");
+			return internalServerError("Oops unable to start");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to send shutdown signal");
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,7 +80,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to reboot");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,7 +104,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to destroy");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,7 +130,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to suspend");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,7 +154,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to resume");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -178,7 +178,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to delete");
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -228,7 +228,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to snapshot");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -257,7 +257,7 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-			return internalServerError("Oops unable to start");
+			return internalServerError("Oops unable to revert");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
