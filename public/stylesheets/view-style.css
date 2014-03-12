@@ -6,6 +6,10 @@
     background-color: #dd9999;
 }
 
+.vm-row-selected { 
+    background-color: #cc9999;
+}
+
 .fa-github:hover {
     cursor: pointer;
 }
@@ -86,8 +90,8 @@
 
 .icons {
     padding: 6px 10px;
-    border: 2px solid #ddd;
-    border-radius: 4px;
+    border: 2px solid transparent;
+    border-radius: 2px;
 }
 
 .icons:hover,
@@ -168,4 +172,5 @@
 }
 body {
     margin: 20px 30px;
+    background-color: black;
 }

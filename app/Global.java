@@ -39,13 +39,14 @@ public class Global extends GlobalSettings {
 					" hostName VARCHAR(255) NOT NULL, " + 
 					" PRIMARY KEY ( hostIP ))"; 
 			stmt.executeUpdate(sql);
-			
+			stmt.executeUpdate("TRUNCATE TABLE Host");
 			sql = "CREATE TABLE IF NOT EXISTS snapshot " +
 					"(vmuuid VARCHAR(255) NOT NULL, " +
 					" path VARCHAR(255) NOT NULL, "+
 					"PRIMARY KEY ( vmuuid ))"; 
 			if((stmt.executeUpdate(sql))<0)
 				System.out.println("Created snapshot table in given database...");
+			stmt.executeUpdate("TRUNCATE TABLE snapshot");
 			sql = "CREATE TABLE IF NOT EXISTS VM " +
 					"(vmuuid VARCHAR(255) NOT NULL, " +
 					" state VARCHAR(255) NOT NULL, "+
@@ -55,6 +56,7 @@ public class Global extends GlobalSettings {
 			//		" time DATETIME NOT NULL)";
 			if((stmt.executeUpdate(sql))<0)
 				System.out.println("Created vmSaveSnapshot table in given database...");
+			stmt.executeUpdate("TRUNCATE TABLE VM");
 			stmt.close();
 			dbConn.close();
 			

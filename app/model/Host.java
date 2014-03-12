@@ -96,21 +96,31 @@ public class Host {
 				"<name>"+json.findPath("vmName").textValue()+"</name>"+
 				"<memory unit='MiB'>"+String.valueOf(json.findPath("memory").asInt())+"</memory>"+
 				"<vcpu>"+String.valueOf(json.findPath("vcpu").asText())+"</vcpu>";
+		
 		String title=json.findPath("title").textValue();
+		
 		if(title!=null)
 			xml=xml.concat("<title>"+title+"</title>");
 		String description=json.findPath("description").textValue();
+		
 		if(description!=null)
 			xml=xml.concat("<description>"+description+"/description>");
 		String arch=json.findPath("arch").textValue();
+		
 		if(arch==null)
 			arch="'x86_64'";
+		
 		xml=xml.concat("<os>"+
 				"<type arch='x86_64'>hvm</type>"+
 				"<boot dev='"+bootDev+"'/>");
+		
 		String bootmenu=json.findPath("bootmenu").textValue();
+		
 		if(bootmenu!=null)
+		{
 			xml=xml.concat("<bootmenu enable='"+bootmenu+"'>");
+		}
+		
 		xml=xml.concat("</os>"+
 				"<clock offset='utc'/>"+
 				"<features>     <acpi/>       <apic/>	 <hap/><pae/>	     </features>"+
@@ -121,16 +131,30 @@ public class Host {
 				"<emulator>/usr/bin/kvm-spice</emulator>");
 	
 		//disk device floppy", "disk", "cdrom
-      switch (bootDev) {
-      //case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
+	if(bootDev.compareTo("cdrom")==0)
+	{
+       //case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
 		//	break;
-      case "cdrom": xml=xml.concat("<disk type='file' device='cdrom'>"+
-			"<source file='"+json.findPath("iso").asText()+"'/>"+
+       xml=xml.concat("<disk type='file' device='cdrom'>"+
+			"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
 			"<target dev='hdc'/>"+
 			"<readonly/>"+
     		  "</disk>");
+	}else if (bootDev.compareTo("hd")==0) {
+		xml=xml.concat("<disk type='file' device='disk'>"+
+				"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
+				"<target dev='vda' bus='virtio'/>"+
+				"</disk>");
+	}else if (bootDev.compareTo("network")==0) {
+		xml=xml.concat("<disk type='file' device='network'>"+
+				"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
+				"<target dev='hdc'/>"+
+				"<readonly/>"+
+	    		  "</disk>");
+	}
 	
-      break;
+
+      /*
       case "hd": xml=xml.concat("<disk type='volume' device='disk'>"+
     		  "<driver name='qemu' type='raw'/>"+
     		  "<source pool='iscsi' volume='unit:0:0:1' />"+
@@ -141,7 +165,7 @@ public class Host {
     		  "<source file='"+json.findPath("disk").asText()+"/>"+
     		  "<target dev='hda'/>"+
     	      "</disk>");*/
-      
+      /*
       break;
       case "network": xml=xml.concat("<disk type='network' device='cdrom'>"+
     		  "<source protocol='iscsi' name='iqn.2014-01.com.cmskvm:storage-server/1'>"+
@@ -161,7 +185,7 @@ public class Host {
 
 	default:
 		break;
-	}
+	}*/
       
       xml=xml.concat("<interface type='network'>"+
     		  "<source network='default'/>"+
@@ -191,7 +215,7 @@ public class Host {
 			return -1;
 		}
         
-    }
+}
     
     public  int createStoragePool(JsonNode json) throws LibvirtException {
     	String xmldesc=new String();

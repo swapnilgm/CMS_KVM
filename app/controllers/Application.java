@@ -58,8 +58,10 @@ public class Application extends Controller {
 			
 			for (Domain vm : vmList) {
 				jso=Json.newObject();
-				jso.put("ID",vm.getID());
 				jso.put("Name",vm.getName());
+				if(vm.isActive()==1)
+					jso.put("Status","Active");
+				else jso.put("Status","InActive");
 				//jso.put("Host",vm.getConnect().getHostName());
 				jso.put("NoOfCPU",vm.getInfo().nrVirtCpu);
 				jso.put("MaxMemory",vm.getMaxMemory());

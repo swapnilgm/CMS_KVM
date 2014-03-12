@@ -30,11 +30,10 @@ GET	 /vm/resume		controllers.VMOperation.resume(vmName : String, hostName : Stri
 GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
 #delete signal
 GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
-#dynamic usages
-GET  /vm/:hostName		controllers.Application.getDynamicList(hostName : String)
+
 #createintg vm
-POST  /create/:hostName			controllers.Application.createVM(hostName : String)
-POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
+POST  /vm/create/:hostName			controllers.Application.createVM(hostName : String)
+POST  /vm/create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
 #storage
 GET /storage/pool/list/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
 GET /storage/vol/list/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
