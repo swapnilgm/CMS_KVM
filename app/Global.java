@@ -12,6 +12,7 @@ import java.util.Timer;
 
 public class Global extends GlobalSettings {
 	public void onStart(Application app) {
+
 		initDB();
 		//get subnet
 //		HostList.subnet="10.42.0";

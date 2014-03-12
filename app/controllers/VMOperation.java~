@@ -27,9 +27,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-
+<<<<<<< HEAD
 			return internalServerError("Oops unable to send start signal");
-
+=======
+			return internalServerError("Oops unable to start");
+>>>>>>> ae07336b28a00b22b008f844e4b93ff657798961
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,8 +57,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-		return internalServerError("Oops unable to send shutdown signal");
-
+<<<<<<< HEAD
+			return internalServerError("Oops unable to shutdown");
+=======
+			return internalServerError("Oops unable to send shutdown signal");
+>>>>>>> ae07336b28a00b22b008f844e4b93ff657798961
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -231,9 +236,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			e.printStackTrace();
-
+<<<<<<< HEAD
 			return internalServerError("Oops unable to create snapshot");
-
+=======
+			return internalServerError("Oops unable to snapshot");
+>>>>>>> ae07336b28a00b22b008f844e4b93ff657798961
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
