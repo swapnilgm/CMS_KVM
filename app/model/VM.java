@@ -157,7 +157,35 @@ public class VM {
 				return 1;	//("Successful revert");
 			}else {
 				return 0;	//("Unsuccessful revert");
-			}
+			}		
+	}
+	
+	public int attachStorage(String hostName, String vmName,  String poolName, String volName) throws LibvirtException, SQLException{
+		Host tempHost=new Host(hostName);
+		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		if(vm==null){
+			tempHost.close();
+			return -1;		//not found
+		}
+		StoragePool stp=tempHost.conn.storagePoolLookupByName(poolName);
+		if(stp==null){
+			tempHost.close();
+			return -2;		//not found
+		}
+		StorageVol stv=stp.storageVolLookupByName(volName);
+		if(stv==null){
+			
+			return -3;		//not found
+		}
+		stv.free();
+		stp.free();
+		String xmlDesc=new String();
+		xmlDesc.concat(" <disk type='volume' device='disk'>"
+				+"<source pool='"+ poolName + "' volume='" + volName + "'/>"
+				+"<target dev='hda' bus='ide'/>"
+				+"</disk>");
+		vm.attachDeviceFlags(xmlDesc, 0);		
+		return 1;	//("Successful attachment");
 		
 	}
 }        

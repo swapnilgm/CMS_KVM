@@ -1,5 +1,6 @@
 package model;
 	
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -86,12 +87,12 @@ public class Host {
 		return null;
 	}
 	
-    public int createVM(JsonNode json)  
-    {
-    	String xml=new String();
-    	//String shortdesc="creating with test aspp";
-    	String bootDev=json.findPath("bootType").asText();
-		 //os boot device "fd", "hd", "cdrom" or "network"
+	public int createVM(JsonNode json)  
+	{
+		String xml=new String();
+		//String shortdesc="creating with test aspp";
+		String bootDev=json.findPath("bootType").asText();
+		//os boot device "fd", "hd", "cdrom" or "network"
 		xml="  <domain type='kvm'>"+
 				"<name>"+json.findPath("vmName").textValue()+"</name>"+
 				"<memory unit='MiB'>"+String.valueOf(json.findPath("memory").asInt())+"</memory>"+
@@ -129,32 +130,32 @@ public class Host {
 				"<on_poweroff>destroy</on_poweroff>"+
 				"<devices>"+        
 				"<emulator>/usr/bin/kvm-spice</emulator>");
-	
+		
 		//disk device floppy", "disk", "cdrom
-	if(bootDev.compareTo("cdrom")==0)
-	{
-       //case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
-		//	break;
-       xml=xml.concat("<disk type='file' device='cdrom'>"+
-			"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
-			"<target dev='hdc'/>"+
-			"<readonly/>"+
-    		  "</disk>");
-	}else if (bootDev.compareTo("hd")==0) {
-		xml=xml.concat("<disk type='file' device='disk'>"+
-				"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
-				"<target dev='vda' bus='virtio'/>"+
-				"</disk>");
-	}else if (bootDev.compareTo("network")==0) {
-		xml=xml.concat("<disk type='file' device='network'>"+
-				"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
-				"<target dev='hdc'/>"+
-				"<readonly/>"+
-	    		  "</disk>");
-	}
-	
-
-      /*
+		if(bootDev.compareTo("cdrom")==0)
+		{
+			//case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
+			//	break;
+			xml=xml.concat("<disk type='file' device='cdrom'>"+
+					"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
+					"<target dev='hdc'/>"+
+					"<readonly/>"+
+					"</disk>");
+		}else if (bootDev.compareTo("hd")==0) {
+			xml=xml.concat("<disk type='file' device='disk'>"+
+					"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
+					"<target dev='vda' bus='virtio'/>"+
+					"</disk>");
+		}else if (bootDev.compareTo("network")==0) {
+			xml=xml.concat("<disk type='file' device='network'>"+
+					"<source file='/media/ISO/"+json.findPath("iso").asText()+".iso'/>"+
+					"<target dev='hdc'/>"+
+					"<readonly/>"+
+					"</disk>");
+		}
+		
+		
+		/*
       case "hd": xml=xml.concat("<disk type='volume' device='disk'>"+
     		  "<driver name='qemu' type='raw'/>"+
     		  "<source pool='iscsi' volume='unit:0:0:1' />"+
@@ -165,7 +166,7 @@ public class Host {
     		  "<source file='"+json.findPath("disk").asText()+"/>"+
     		  "<target dev='hda'/>"+
     	      "</disk>");*/
-      /*
+		/*
       break;
       case "network": xml=xml.concat("<disk type='network' device='cdrom'>"+
     		  "<source protocol='iscsi' name='iqn.2014-01.com.cmskvm:storage-server/1'>"+
@@ -186,81 +187,128 @@ public class Host {
 	default:
 		break;
 	}*/
-      
-      xml=xml.concat("<interface type='network'>"+
-    		  "<source network='default'/>"+
-    		  "</interface>"+
-    		  "<input type='mouse' />"+
-    		  "<graphics type='vnc' port='-1' autoport='yes'/>"+
-    		  "</devices>"+
-    		  "</domain>");
-      
-	    try {
-	    	if(json.findPath("persistant").asText().compareTo("Persistent")==0){
-	    		Domain vm=conn.domainDefineXML(xml);
-	    		if(vm!=null){
-	    			vm.create();
-	    			return 1;
-	    		}
+		
+		xml=xml.concat("<interface type='network'>"+
+				"<source network='default'/>"+
+				"</interface>"+
+				"<input type='mouse' />"+
+				"<graphics type='vnc' port='-1' autoport='yes'/>"+
+				"</devices>"+
+				"</domain>");
+		
+		try {
+			if(json.findPath("persistant").asText().compareTo("Persistent")==0){
+				Domain vm=conn.domainDefineXML(xml);
+				if(vm!=null){
+					vm.create();
+					return 1;
+				}
 				else return 0;
-	    	}
-	    	else{
-	    		if(conn.domainCreateXML(xml,0)!=null)
-	    		    			return 1;
+			}
+			else{
+				if(conn.domainCreateXML(xml,0)!=null)
+					return 1;
 				else return 0;
-	    	}
+			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			
 			return -1;
 		}
-        
-}
+		
+	}
     
-    public  int createStoragePool(JsonNode json) throws LibvirtException {
+    public  int createStoragePool(JsonNode json)throws LibvirtException {
     	String xmldesc=new String();
+    	String remoteHostName=json.findPath("remoteHostName").asText();
     	String poolName=json.findPath("poolName").asText();
-    	String hostName=json.findPath("hostName").asText();
-    	String devicePath=json.findPath("devPath").asText();
-    	xmldesc=xmldesc.concat("<pool type=iscsi>"
-    			+ "<name>"+poolName+"</name>"
+    	if(conn.storagePoolLookupByName(poolName)!=null)
+    		return -3;
+    		
+    	String storPath=json.findPath("storPath").asText();
+    	String poolType=json.findPath("poolType").asText();
+    	xmldesc=xmldesc.concat("<pool type=\""+ poolType +"\">"
+    			+ "<name>"+ poolName +"</name>"
     			+"<source>"
-    			+"<host name="+hostName+"/>"
-    			+"<device path="+devicePath+"/>"         
-    			+"</source>"
-    			+"<target>"
-    			+"<path>/dev/disk/by-path</path>"
-    			+"</target>"
-    			+"</pool>");
+    			+"<host name=\""+ remoteHostName + "\"/>");
+    	if(poolType.compareTo("iscsi")==0) {
+    		
+    		xmldesc=xmldesc.concat("<device path=\""+ storPath +"\"/>"
+    				+"</source>"
+    				+"<target>"
+    				+"<path>/dev/disk/by-path</path>");
+    	}else if ((poolType.compareTo("netfs")==0)) {
+    		/*File dir = new File("/var/lib/libvirt/qemu/"+ poolName);
+    		if(!dir.mkdir())
+    		{
+    			System.out.println("unable to create directory");
+    			return -1;
+    		}*/
+    		
+    		xmldesc=xmldesc.concat("<dir path=\"" + storPath + "\"/>"
+    				+"</source>"
+    				+"<target>"
+    				+"<path>/var/lib/libvirt/images/</path>");
+    	}
+    	else return -2;
+    	xmldesc=xmldesc.concat("</target></pool>");    	
+    	
     	StoragePool stp=conn.storagePoolDefineXML(xmldesc, 0);
     	if(stp==null){    		
     		return -1;
     	} else {
-    		stp.create(0);
+    		
+    		try {
+				stp.create(0);
+				
+			} catch (LibvirtException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e.getMessage());
+				stp.undefine();				
+			}
+    		stp.setAutostart(1);
     		stp.free();
     		return 1;
     	}
     }    	
     
-    public void deleteStoragePool(String poolName) throws LibvirtException {
+    public int deleteStoragePool(String poolName) throws LibvirtException {
     	StoragePool stp=conn.storagePoolLookupByName(poolName);
-    	stp.delete(0);
-    	stp.free();
-    	return;
+    	if(stp==null)
+    		return -1;
+    	
+    	try {
+    		if(stp.isActive()==1)
+    			stp.destroy();
+    		if(stp.isPersistent()==1)
+			{
+    			stp.delete(0);
+				stp.undefine();
+			}
+			stp.free();
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		}
+    	
+    	return 1;
     }
     
-    public String[] listStoragePool(int filter) throws LibvirtException {
+    public ArrayList<ObjectNode> listStoragePool(int filter) throws LibvirtException {
     	String [] stpListActive;
     	String [] stpListInactive;
     	String [] stpList=null;
     	
     	switch(filter) {
     	case 0:
-    		stpListActive=conn.listStoragePools();
-    		return stpListActive;
+    		stpList=conn.listStoragePools();
+    		break;
+    		
     	case 1:
-    		stpListInactive=conn.listDefinedDomains();
-    		return stpListInactive;
+    		stpList=conn.listDefinedDomains();
+    		break;
+    		
     	case 2:
     		stpListActive=conn.listStoragePools();
     		stpListInactive=conn.listDefinedDomains();
@@ -272,23 +320,34 @@ public class Host {
     		for(int i=0;i<stpListInactive.length;i++,index++) {
     			stpList[index]=stpListInactive[i];
     		}
-    		return stpList;
+    		break;
     	default : return null;
     	}
-    	
-    }
-    
-    
-    public String[] listStorageVol(String poolName) throws LibvirtException {
-    	StoragePool stp=conn.storagePoolLookupByName(poolName);
-    	if(stp==null)
-    		return null;	//pool not found
-    	
-    	String [] stvList=stp.listVolumes();
-    	stp.free();
-    	return stvList;
-    }
-    
+    	StoragePool stp =null;
+    	StoragePoolInfo stpInfo= null;
+    		ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
+			ObjectNode jso=null;
+			
+			for (String stpName : stpList) {
+				stp = conn.storagePoolLookupByName(stpName);				
+				jso=Json.newObject();
+				jso.put("Name",stpName);
+				
+				stpInfo=stp.getInfo();
+		//				stpInfo.state
+			//	stp.getInfo().allocation;
+				//stp.getInfo().available;
+				stp.getInfo().toString();
+			//	stp.getInfo().capacity
+				jso.put("Info",stpInfo.toString());
+				jso.put("persistant",stp.isPersistent());
+				jso.put("noOfVol",stp.numOfVolumes());				
+				stp.free();
+				jsolist.add(jso);
+				jso=null;
+			}
+    	return jsolist;    	
+    }    
 
 	public synchronized static ArrayList<Domain> staticListAllVM(int filter) throws LibvirtException, SQLException {
 		Host tempHost;
@@ -353,6 +412,10 @@ public class Host {
 			try {
 				vm=conn.domainLookupByID(id);
 			jso=vmstat.getVMStatus(vm.getUUIDString());
+			if(vm.isPersistent()==1)
+				jso.put("Persistant","Yes");
+			else
+				jso.put("Persistant","No");
 			jso.put("name",vm.getName());
 			} catch (LibvirtException e) {
 				// TODO Auto-generated catch block

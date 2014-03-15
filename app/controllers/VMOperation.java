@@ -5,14 +5,33 @@ import java.sql.SQLException;
 import org.libvirt.LibvirtException;
 
 import play.mvc.*;
+import model.Host;
 import model.VM;
 
 public class VMOperation extends Controller{
 	
 	public static Result start(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.start(vmName, hostName)){
@@ -39,8 +58,26 @@ public class VMOperation extends Controller{
 	
 	public static Result shutdown(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.shutdown(vmName, hostName)){
@@ -67,8 +104,26 @@ public class VMOperation extends Controller{
 	//for following op check for the flags
 	public static Result reboot(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.reboot(vmName, hostName)){
@@ -93,8 +148,26 @@ public class VMOperation extends Controller{
 	
 	public static Result destroy(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.destroy(vmName, hostName)){
@@ -117,8 +190,26 @@ public class VMOperation extends Controller{
 	
 	public static Result suspend(String vmName, String hostName){
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.suspend(vmName, hostName)){
@@ -143,8 +234,26 @@ public class VMOperation extends Controller{
 	
 	public static Result resume(String vmName, String hostName){
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.resume(vmName, hostName)){
@@ -167,8 +276,26 @@ public class VMOperation extends Controller{
 	
 	public static Result delete(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.delete(vmName, hostName)){
@@ -191,8 +318,26 @@ public class VMOperation extends Controller{
 	
 	public static Result save(String vmName, String hostName) {
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.save(vmName, hostName)){
@@ -215,8 +360,26 @@ public class VMOperation extends Controller{
 	
 	public static Result snapshot(String vmName, String hostName){
 		VM vm;
-		//validateHostName
-		//validteVMName
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		try {
 			vm=new VM();
 			switch(vm.snapshot(hostName, vmName, request().body().asJson())){
@@ -244,6 +407,26 @@ public class VMOperation extends Controller{
 	
 	public static Result revert(String vmName, String hostName, String snapshot){
 		VM vm;
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
 		//validateHostName
 		//validteVMName
 		//snapshot name validation
@@ -270,4 +453,36 @@ public class VMOperation extends Controller{
 		}   
 		
 	}
+
+	public static Result attachStorage(String vmName, String hostName, String poolName, String volName) {
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){				
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+			VM vm = new VM();
+			int res=vm.attachStorage(hostName, vmName, poolName, volName);
+			if(res==1)
+				return created("attached");
+			else if (res==-3) {
+				return notFound("Pool "+poolName +" not found.");
+			}else
+				return badRequest();	//chk once again
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return internalServerError("Oops database connection error");
+		} 
+		
+	}
 }        
+

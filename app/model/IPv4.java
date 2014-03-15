@@ -6,11 +6,7 @@ import java.util.List;
 public class IPv4 {
     int baseIPnumeric;
     int netmaskNumeric;
-/**
-* Specify IP in CIDR format like: new IPv4("10.1.0.25/16");
-*
-*@param IPinCIDRFormat
-*/
+
     public IPv4(String IPinCIDRFormat) throws NumberFormatException {
 
         String[] st = IPinCIDRFormat.split("\\/");
@@ -48,11 +44,6 @@ public class IPv4 {
         netmaskNumeric = netmaskNumeric << (32 - numericCIDR);
     }
 
-/**
-* Get the IP in symbolic form, i.e. xxx.xxx.xxx.xxx
-*
-*@return
-*/
     public String getIP() {
         return convertNumericIpToSymbolic(baseIPnumeric);
     }
@@ -71,13 +62,6 @@ public class IPv4 {
         return sb.toString();
     }
 
-
-/**
-* Get an array of all the IP addresses available for the IP and netmask/CIDR
-* given at initialization
-*
-*@return
-*/
     public List<String> getAvailableIPs() {
 
         ArrayList<String> result = new ArrayList<String>();
@@ -110,12 +94,6 @@ public class IPv4 {
         return result;
     }
 
-
-/**
-* Returns number of hosts available in given range
-*
-*@return number of hosts
-*/
     public Long getNumberOfHosts() {
         int numberOfBits;
 
@@ -134,13 +112,6 @@ public class IPv4 {
         return x.longValue();
     }
 
-    
-/**
-* Checks if the given IP address contains in subnet
-*
-*@param IPaddress
-*@return
-*/
     public boolean contains(String IPaddress) {
         Integer checkingIP = 0;
         String[] st = IPaddress.split("\\.");

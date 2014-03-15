@@ -32,13 +32,14 @@ GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : St
 GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 
 #createintg vm
-POST  /vm/create/:hostName			controllers.Application.createVM(hostName : String)
+POST  /vm/create			controllers.Application.createVM(hostName : String)
 POST  /vm/create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
 #storage
-GET /storage/pool/list/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
-GET /storage/vol/list/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
-#GET /storage/pool/create/:hostName		controllers.Strorage.createStoragePool()
-GET /storage/pool/delete/:hostName		controllers.Strorage.deleteStoragePool(hostName : String, poolName : String )
-
+GET /storage/pool/list		controllers.Storage.listStoragePool(hostName : String, filter: Int)
+GET /storage/vol/list			controllers.Storage.listStorageVol(hostName : String, poolName : String)
+POST /storage/pool/create		controllers.Storage.createStoragePool(hostName : String)
+GET /storage/pool/delete		controllers.Storage.deleteStoragePool(hostName : String, poolName : String )
+POST /storage/vol/create		controllers.Storage.createStorageVol(hostName : String, poolName : String)
+GET /storage/vol/delete		controllers.Storage.deleteStorageVol(hostName : String, poolName : String, volName : String )
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

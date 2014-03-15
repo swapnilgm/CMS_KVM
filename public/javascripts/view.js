@@ -83,7 +83,7 @@ $("#static-list .fa-refresh").on("click", function( event ) {
 });
 
 $("#static-list .fa-play").on("click", function( event ) {
-    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    var vmName = $(".vm-row-selected td:nth-child(2)").html();
     $.ajax({
         url: "/vm/start",
         type: "GET",
@@ -100,7 +100,7 @@ $("#static-list .fa-play").on("click", function( event ) {
 });
 
 $("#static-list .fa-times").on("click", function( event ) {
-    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    var vmName = $(".vm-row-selected td:nth-child(2)").html();
     console.log(vmName);
     $.ajax({
         url: "/vm/delete",
@@ -119,7 +119,7 @@ $("#static-list .fa-times").on("click", function( event ) {
 });
 
 $("#static-list .fa-stop").on("click", function( event ) {
-    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    var vmName = $(".vm-row-selected td:nth-child(2)").html();
     console.log(vmName);
     $.ajax({
         url: "/vm/shutdown",
@@ -137,7 +137,7 @@ $("#static-list .fa-stop").on("click", function( event ) {
 });
 
 $("#static-list .fa-power-off").on("click", function( event ) {
-    var vmName = $(".vm-row-selected td:nth-child(3)").html();
+    var vmName = $(".vm-row-selected td:nth-child(2)").html();
     console.log(vmName);
     $.ajax({
         url: "/vm/destroy",
@@ -320,3 +320,29 @@ $(function () {
         });
     });
     
+    /*********************Create vm ****************************/
+    $('#vm-form').on("submit",function () {
+    var VMParam = {
+	name: document.getElementById("vm-name ").textContent,
+	vcpu:document.getElementById("vcpu").value,
+	os: document.getElementById("os").value,
+	bootdev: document.getElementById("bootdev ").value,
+	memory: document.getElementById("ram ").value
+};
+    console.log(VMParam);
+	$.ajax({
+		url: '/vm/create',
+		type: 'POST',
+		contentType: 'application/json',
+		//datatype: 'json',
+		data: JSON.stringify(VMParam),
+		success: function (data, textStatus, jqXHR) {
+			alert("VM Created Succesfully !! ");
+			
+		},
+		error: function (xhr, status) {
+			alert("	Sorry VM can not be created!");
+			
+		},
+	})
+});

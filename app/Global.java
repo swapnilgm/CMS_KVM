@@ -52,7 +52,7 @@ public class Global extends GlobalSettings {
 					"(vmuuid VARCHAR(255) NOT NULL, " +
 					" state VARCHAR(255) NOT NULL, "+
 					" cpu DECIMAL(5,2) NOT NULL, "+
-					" memory DECIMAL(5,2) NOT NULL "+	
+					" memory DECIMAL(5,2) NOT NULL "+					
 					") WITH OIDS";
 			//		" time DATETIME NOT NULL)";
 			if((stmt.executeUpdate(sql))<0)
