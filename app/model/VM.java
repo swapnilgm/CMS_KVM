@@ -160,7 +160,7 @@ public class VM {
 			}		
 	}
 	
-	public int attachStorage(String hostName, String vmName,  String poolName, String volName) throws LibvirtException, SQLException{
+	public int attachStorage(String hostName, String vmName,  String poolName, String volName) throws SQLException, LibvirtException{
 		Host tempHost=new Host(hostName);
 		Domain vm=tempHost.conn.domainLookupByName(vmName);
 		if(vm==null){
@@ -168,23 +168,55 @@ public class VM {
 			return -1;		//not found
 		}
 		StoragePool stp=tempHost.conn.storagePoolLookupByName(poolName);
+		tempHost.close();
 		if(stp==null){
-			tempHost.close();
 			return -2;		//not found
 		}
-		StorageVol stv=stp.storageVolLookupByName(volName);
+	
+		
+		StorageVol stv;
+		try {
+			stv = stp.storageVolLookupByName(volName);
+		} catch (LibvirtException e) {
+			stp.free();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -3;		//not found
+		}
 		if(stv==null){
-			
+			stp.free();
 			return -3;		//not found
 		}
 		stv.free();
 		stp.free();
-		String xmlDesc=new String();
-		xmlDesc.concat(" <disk type='volume' device='disk'>"
+		
+		char dev='a';
+		String xmlDesc=new String("<disk type='volume' device='disk'>"
 				+"<source pool='"+ poolName + "' volume='" + volName + "'/>"
-				+"<target dev='hda' bus='ide'/>"
+				+"<target dev='hd"+ Character.toString(dev) +"'/>" //try change hd'a' based on avalible values 
 				+"</disk>");
-		vm.attachDeviceFlags(xmlDesc, 0);		
+		boolean flag=true;
+		while(flag)
+		{
+			flag=false;			
+			try{			
+				vm.attachDeviceFlags(xmlDesc, 0);
+			} catch (LibvirtException e) {
+				if(e.getError().getCode().ordinal()==55){
+					if(dev-'a' > 24 )
+						return 0;
+					dev++;
+					System.out.println(dev);
+					xmlDesc.replaceAll("<target dev='hd[a-z]", "<target dev='hd"+Character.toString(dev));
+					System.out.println(xmlDesc);
+					flag=true;
+				}
+				else
+					throw e;
+				// TODO Auto-generated catch block
+//			return -3;		//not found
+			}
+		}
 		return 1;	//("Successful attachment");
 		
 	}

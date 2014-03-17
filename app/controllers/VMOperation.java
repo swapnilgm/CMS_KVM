@@ -454,7 +454,7 @@ public class VMOperation extends Controller{
 		
 	}
 
-	public static Result attachStorage(String vmName, String hostName, String poolName, String volName) {
+	public static Result attachStorage(String hostName, String vmName,  String poolName, String volName) {
 		Host tempHost;
 		try {
 			if(!Host.ishostExist(hostName))
@@ -465,12 +465,16 @@ public class VMOperation extends Controller{
 			} else {
 				return notFound("VM "+vmName+" not found.");
 			}
+			
 			VM vm = new VM();
 			int res=vm.attachStorage(hostName, vmName, poolName, volName);
 			if(res==1)
-				return created("attached");
-			else if (res==-3) {
+				return created("attached");			
+			else if (res==-2) {
 				return notFound("Pool "+poolName +" not found.");
+			}
+			else if (res==-3) {
+				return notFound("Vol "+volName +" not found.");
 			}else
 				return badRequest();	//chk once again
 		} catch (LibvirtException e) {

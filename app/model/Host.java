@@ -222,8 +222,12 @@ public class Host {
     	String xmldesc=new String();
     	String remoteHostName=json.findPath("remoteHostName").asText();
     	String poolName=json.findPath("poolName").asText();
+    	try {
     	if(conn.storagePoolLookupByName(poolName)!=null)
     		return -3;
+    	} catch (LibvirtException e) {
+    		e.printStackTrace();    		
+    	}
     		
     	String storPath=json.findPath("storPath").asText();
     	String poolType=json.findPath("poolType").asText();
@@ -231,24 +235,26 @@ public class Host {
     			+ "<name>"+ poolName +"</name>"
     			+"<source>"
     			+"<host name=\""+ remoteHostName + "\"/>");
+    	
     	if(poolType.compareTo("iscsi")==0) {
     		
     		xmldesc=xmldesc.concat("<device path=\""+ storPath +"\"/>"
     				+"</source>"
     				+"<target>"
     				+"<path>/dev/disk/by-path</path>");
+    		
     	}else if ((poolType.compareTo("netfs")==0)) {
-    		/*File dir = new File("/var/lib/libvirt/qemu/"+ poolName);
+    		File dir = new File("~/"+ poolName);
     		if(!dir.mkdir())
     		{
     			System.out.println("unable to create directory");
     			return -1;
-    		}*/
+    		}
     		
     		xmldesc=xmldesc.concat("<dir path=\"" + storPath + "\"/>"
     				+"</source>"
     				+"<target>"
-    				+"<path>/var/lib/libvirt/images/</path>");
+    				+"<path>~/"+ poolName +"</path>");
     	}
     	else return -2;
     	xmldesc=xmldesc.concat("</target></pool>");    	
@@ -264,7 +270,8 @@ public class Host {
 			} catch (LibvirtException e) {
 				// TODO Auto-generated catch block
 				System.out.println(e.getMessage());
-				stp.undefine();				
+				stp.undefine();
+				return 0;
 			}
     		stp.setAutostart(1);
     		stp.free();
@@ -306,12 +313,12 @@ public class Host {
     		break;
     		
     	case 1:
-    		stpList=conn.listDefinedDomains();
+    		stpList=conn.listDefinedStoragePools();
     		break;
     		
     	case 2:
     		stpListActive=conn.listStoragePools();
-    		stpListInactive=conn.listDefinedDomains();
+    		stpListInactive=conn.listDefinedStoragePools();
     		stpList=new String[(stpListActive.length+stpListInactive.length)];
     		int index=0;
     		for(int i=0;i<stpListActive.length;i++,index++) {
@@ -327,7 +334,7 @@ public class Host {
     	StoragePoolInfo stpInfo= null;
     		ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
 			ObjectNode jso=null;
-			
+			long temp,capacity;
 			for (String stpName : stpList) {
 				stp = conn.storagePoolLookupByName(stpName);				
 				jso=Json.newObject();
@@ -336,10 +343,13 @@ public class Host {
 				stpInfo=stp.getInfo();
 		//				stpInfo.state
 			//	stp.getInfo().allocation;
-				//stp.getInfo().available;
-				stp.getInfo().toString();
-			//	stp.getInfo().capacity
-				jso.put("Info",stpInfo.toString());
+				
+				capacity=stpInfo.capacity;
+				jso.put("Capacity",capacity/1024/1024);
+				temp=stpInfo.available;
+				jso.put("Available",temp*100/capacity);
+				temp=stpInfo.allocation;
+				jso.put("Allocation",temp*100/capacity);
 				jso.put("persistant",stp.isPersistent());
 				jso.put("noOfVol",stp.numOfVolumes());				
 				stp.free();

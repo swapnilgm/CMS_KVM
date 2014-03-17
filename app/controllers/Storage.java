@@ -3,12 +3,10 @@ package controllers;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import model.Host;
 import model.StorageDisk;
 
-import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -66,7 +64,10 @@ public class Storage extends Controller{
 								if(tempHost.createStoragePool(json)==-1){
 									tempHost.close();
 									return internalServerError("Server error");
-								}else {
+								}else if(tempHost.createStoragePool(json)==0){
+									tempHost.close();
+									return badRequest("No iscsi target found.");
+								} else {
 									tempHost.close();
 									return created("pool created.");
 								}
@@ -268,7 +269,7 @@ public class Storage extends Controller{
 			}
 			try {
 			StorageDisk st =new StorageDisk(hostName, poolName);
-			String[] list= st.listStorageVol();
+			ArrayList<ObjectNode> list= st.listStorageVol();
 			st.close();
 			if(list!=null){
 				JsonNode js=Json.toJson(list);

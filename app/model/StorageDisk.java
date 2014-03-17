@@ -1,12 +1,18 @@
 package model;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
 import org.libvirt.StorageVol;
+import org.libvirt.StorageVolInfo;
+
+import play.libs.Json;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class StorageDisk {
 	Host tempHost;
@@ -41,7 +47,6 @@ public class StorageDisk {
 		String volName=json.findPath("volName").asText();
     	String capacity=json.findPath("capacity").asText();
     	//String storPath=json.findPath("capacity").asText();
-    	String format=json.findPath("format").asText();
     	xmlDesc=xmlDesc.concat("<volume>"
     			+ "<name>" +volName +"</name>"
         +"<allocation>0</allocation>"
@@ -58,7 +63,7 @@ public class StorageDisk {
       +"</volume>");
          	
     	if(stp==null){    		
-    		return -1;
+    		return -1;    		
     	} else {
     		//check type iscsi or netfs
     			stv=stp.storageVolCreateXML(xmlDesc, 0);
@@ -92,14 +97,28 @@ public class StorageDisk {
 		
 	}
 	
-	public String[] listStorageVol() throws LibvirtException {
+	public ArrayList<ObjectNode> listStorageVol() throws LibvirtException {
     	
     	if(stp==null)
     		return null;	//pool not found
-    	
+    	StorageVol stv = null;
     	String [] stvList=stp.listVolumes();
+    	ArrayList<ObjectNode> jsolist = new ArrayList<ObjectNode>();
+		ObjectNode jso=null;
+    	for(String stvName : stvList)
+    	{
+    		jso=Json.newObject();
+    		jso.put("Name", stvName);
+    		stv=stp.storageVolLookupByName(stvName);
+    		StorageVolInfo stvInfo=stv.getInfo();
+    		//jso.put("Type", stvInfo.type.name()); unn
+    		jso.put("Capacity", stvInfo.capacity/1024/1024);
+    		jso.put("Allocation",stvInfo.allocation*100/stvInfo.capacity);
+    		stv.free();
+    		jsolist.add(jso);
+    	}
     	stp.free();
-    	return stvList;
+    	return jsolist;
     }
 
 }
