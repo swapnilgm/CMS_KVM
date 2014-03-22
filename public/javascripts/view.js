@@ -6,7 +6,6 @@
 5. add tooltips where necessary.
 6. get host name from backend.
 7. start off with dynamic listing.
-8. add event handler for sidebar generation.
 9. units to be added for props.
 **************************************************************************************/
 
@@ -56,7 +55,6 @@ $(".icons").click( function ( event ) {
         $( this ).addClass("icons-select");
 });
 
-/************************* sidebar refresh event handler ******************/
 $("#sidebar .fa-refresh").on("click", function( event ) {
         $.getJSON("/host/list", function( json ) {
             $("#selectable li").remove();
@@ -69,13 +67,10 @@ $("#sidebar .fa-refresh").on("click", function( event ) {
         });
 });
 
-/************************* summary refresh event handler *********************/
 $("#summary .fa-refresh").on("click", function( event ) {
     removeSummary();
     hostName.forEach( getHostInfo );
 });
-
-/************************** static list refresh event handler ****************/
 
 $("#static-list .fa-refresh").on("click", function( event ) {
     removeStaticList();
