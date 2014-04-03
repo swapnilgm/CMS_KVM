@@ -6,7 +6,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.libvirt.LibvirtException;
+import org.libvirt.Network;
+
+import model.Host;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import play.db.DB;
+import play.libs.Json;
 
 public class Dba {
 	Connection dbConn;
@@ -35,16 +43,16 @@ public class Dba {
 		
 		ArrayList<String> hostList;
 		stmt=dbConn.createStatement();
-	  	String query="SELECT hostName FROM Host";
-	  	rs = stmt.executeQuery(query);
-	  	hostList=new ArrayList<String>();
-	  	while(rs.next()){
-	  		hostList.add(rs.getString("hostName"));
-	  	}
-	  	rs.close();
-	  	return hostList;
+		String query="SELECT hostName FROM Host";
+		rs = stmt.executeQuery(query);
+		hostList=new ArrayList<String>();
+		while(rs.next()){
+			hostList.add(rs.getString("hostName"));
+		}
+		rs.close();
+		return hostList;
 	}
-
+	
 	public boolean ishostExist(String hostName) throws SQLException {
 		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostName = '"+hostName+"'");
 		if(rs.next()) {
@@ -60,7 +68,7 @@ public class Dba {
 		return false;					
 	}
 	
-/*	public boolean isIPExist(String hostIP) throws SQLException {
+	/*	public boolean isIPExist(String hostIP) throws SQLException {
 		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
 		if(rs.next()) {
 			if(rs.getInt("total")!=0) {
@@ -81,7 +89,89 @@ public class Dba {
 		stmt.executeUpdate("DELETE FROM Host WHERE hostIP = '"+hostIP+"'");
 		return;
 	}
-	*/	
+	 */	
+	public boolean isName(String name) throws SQLException {
+		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Network WHERE NAME = '"+name+"'");
+		if(rs.next()) {
+			if(rs.getInt("total")!=0) {
+				rs.close();
+				return true;
+			}else {
+				rs.close();
+				return false;
+			}
+		}
+		rs.close();
+		return false;					
+		
+		
+	}
+	
+	
+	
+	public void addNetwork(String name, String hostName, String mode, String bridgeName, String autostart) throws SQLException {
+		stmt.executeUpdate("INSERT INTO Network VALUES('"+name+"','"+hostName+"','"+mode+"','"+ bridgeName+"','"+ autostart+"')");
+		
+		
+	}
+	
+	
+	public void deleteNetwork(String name) throws SQLException {
+		stmt.executeUpdate("DELETE FROM Network WHERE NAME = '"+name+"'");
+		
+	}
+	
+	public ArrayList<ObjectNode> getNetList() throws SQLException {
+		
+		ArrayList<ObjectNode> list=new ArrayList<ObjectNode>();
+		
+		ObjectNode json=Json.newObject();
+		
+		rs=stmt.executeQuery("SELECT NAME, HOST, MODE, BRIDGENAME, AUTOSTART FROM Network");
+		while(rs.next())
+		{
+			json=Json.newObject();
+			json.put("name",rs.getString("NAME"));	
+			json.put("host",rs.getString("HOST"));
+			json.put("mode",rs.getString("MODE"));
+			json.put("bridgename",rs.getString("BRIDGENAME"));
+			json.put("autostart",rs.getString("AUTOSTART"));
+			
+			try{
+				Host tempHost=new Host(rs.getString("HOST"));
+				Network net=tempHost.conn.networkLookupByName(rs.getString("NAME"));
+				tempHost.close();
+				if(net.isActive()==1)
+					json.put("status","Active");
+				else if(net.isActive()==0)
+					json.put("status","Inactive");
+				//else
+				//throw new LibvirtException("Libvirt Error"); 
+				
+				
+				
+			}
+			catch(LibvirtException e)
+			{
+				json.put("status","Not Connected");
+				
+			}
+			finally{
+				list.add(json);
+				json=null;
+				
+			}
+		}
+		
+		rs.close();
+		if(stmt!=null)
+			stmt.close();
+		return list;
+		
+		
+		
+	}
+	
 	public void close() throws SQLException {
 		if(rs!=null)
 			rs.close();

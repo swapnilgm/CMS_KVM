@@ -17,12 +17,16 @@ public class VM {
 		if(vm==null){
 			return -1;		//notFound("No vm "+vmName+" found on host"+hostName+".");
 		}
-		if(vm.create()==0){
-			return 1;		//("started");
+		if(vm.isActive()!=1)
+		{
+			if(vm.create()==0){
+				return 1;		//("started");
+			}
+			else {
+				return 0;		//("Failed to start");
+			}
 		}
-		else {
-			return 0;		//("Failed to start");
-		}
+		else return -2;
 	}
 	
 	public int shutdown(String vmName, String hostName) throws LibvirtException, SQLException {
@@ -206,8 +210,8 @@ public class VM {
 					if(dev-'a' > 24 )
 						return 0;
 					dev++;
-					System.out.println(dev);
-					xmlDesc.replaceAll("<target dev='hd[a-z]", "<target dev='hd"+Character.toString(dev));
+					System.out.println(dev + " and "+Character.toString(dev));
+					xmlDesc=xmlDesc.replaceAll("<target dev='hd([a-z])","<target dev='hd"+Character.toString(dev));
 					System.out.println(xmlDesc);
 					flag=true;
 				}
@@ -217,7 +221,8 @@ public class VM {
 //			return -3;		//not found
 			}
 		}
-		return 1;	//("Successful attachment");
-		
+		return 1;	//("Successful attachment");		
 	}
+	
+	
 }        

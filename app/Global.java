@@ -57,6 +57,17 @@ public class Global extends GlobalSettings {
 			//		" time DATETIME NOT NULL)";
 			if((stmt.executeUpdate(sql))<0)
 				System.out.println("Created vmSaveSnapshot table in given database...");
+			sql = "CREATE TABLE IF NOT EXISTS Network " +
+	                "(name VARCHAR(255) NOT NULL, " +
+	                "host VARCHAR(255) NOT NULL, " + 
+	                "mode  VARCHAR(15), " +
+	                "bridgename  VARCHAR(255),"+
+	                "autostart VARCHAR(5) NOT NULL ,"+
+	                "PRIMARY KEY(name))"; 
+	                
+	    	if((stmt.executeUpdate(sql))<0)
+	    		System.out.println("Created NETWORK table in given database...");	
+
 			stmt.executeUpdate("TRUNCATE TABLE VM");
 			stmt.close();
 			dbConn.close();

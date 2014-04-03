@@ -140,7 +140,7 @@ $("#static-list .fa-power-off").on("click", function( event ) {
     var vmName = $(".vm-row-selected td:nth-child(2)").html();
     console.log(vmName);
     $.ajax({
-        url: "/vm/destroy",
+        url: "/vm/poweroff",
         type: "GET",
         data: { "vmName" : vmName, "hostName" : hostName[0] },
         dataType: "text",
@@ -166,7 +166,7 @@ function removeStaticList() {
 
 /******************************************** hostName functions *********************************/
 function getHostInfo( elem ) {
-    $.getJSON( "/host/info/" + elem, function( resp ) {
+    $.getJSON( "/host/info?hostName=" + elem, function( resp ) {
         var propList = [];
         
         for ( var prop in resp ) {
@@ -180,7 +180,7 @@ function getHostInfo( elem ) {
 };
 
 function getStaticList( elem ) {
-    $.getJSON("/vm/list/configuration/" + elem + "?filter=2", function( resp ) {
+    $.getJSON("/vm/list/configuration?hostName=" + elem + "&filter=2", function( resp ) {
         var propList = [], str = "";
         
         for( var prop in resp[0] ) {

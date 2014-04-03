@@ -24,11 +24,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -41,17 +41,20 @@ public class VMOperation extends Controller{
 				return ok("Failed to start");
 			case 1:
 				return ok("started");
-			default: 
-				return ok("ok");
+			case -2: 
+				return badRequest("VM is already in active state.");
+				default: 
+					return badRequest("server error");
+				
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 
 			return internalServerError("Oops unable to send start signal");
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}    
 	}
@@ -70,11 +73,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -91,12 +94,12 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		return internalServerError("Oops unable to send shutdown signal");
 
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   		   	
 	}        
@@ -116,11 +119,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -137,11 +140,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to reboot");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity problem.");
 		}   	
 	}
@@ -160,11 +163,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -174,16 +177,16 @@ public class VMOperation extends Controller{
 			case -1:
 				return notFound("No vm "+vmName+" found on host"+hostName+".");
 			case 1:
-				return ok("destroyed");	//force oof
+				return ok("poweroff");	//force oof
 			default: 
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to destroy");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}        
@@ -202,11 +205,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -223,11 +226,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to suspend");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}
@@ -246,11 +249,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -265,11 +268,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to resume");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}
@@ -288,11 +291,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -307,11 +310,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to delete");
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}	
@@ -330,11 +333,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -349,11 +352,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to save domain");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}     
@@ -372,11 +375,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -393,13 +396,13 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 
 			return internalServerError("Oops unable to create snapshot");
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}	
 		
@@ -419,11 +422,11 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		
@@ -444,11 +447,11 @@ public class VMOperation extends Controller{
 				return ok("ok");
 			}
 		} catch (LibvirtException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops unable to revert");
 		}	catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database server connectivity.");
 		}   
 		
@@ -479,11 +482,11 @@ public class VMOperation extends Controller{
 				return badRequest();	//chk once again
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops libvirt error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		} 
 		

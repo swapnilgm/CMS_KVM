@@ -9,13 +9,13 @@ GET		/host/list					controllers.Application.getHostList()
 GET  /host/info		controllers.Application.hostInfo(hostName : String)
 
 #VM operations
-GET     /vm/list/configuration/:hostName    	controllers.Application.getStaticList(hostName : String, filter : Int )
-#param hostName ---all >lis all   --other-> host specific list
-GET     /vm/list/runtime/:hostName      controllers.Application.getDynamicList(hostName : String)
+GET     /vm/list/configuration    	controllers.Application.getStaticList(hostName : String, filter : Int )
+#param hostName ---all >list all   --other-> host specific list
+GET     /vm/list/runtime      controllers.Application.getDynamicList(hostName : String)
 
 #createintg vm
 POST  /vm/create			controllers.Application.createVM(hostName : String)
-POST  /vm/create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
+POST  /vm/create/validate			controllers.Application.validateVMName(hostName : String,vmName: String)
 #start vm
 GET	 /vm/start		controllers.VMOperation.start(vmName : String, hostName : String)
 #send shutdown signal to vm
@@ -27,7 +27,7 @@ GET	 /vm/suspend		controllers.VMOperation.suspend(vmName : String, hostName : St
 #resume vm
 GET	 /vm/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
 #power off signal
-GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : String)
+GET	 /vm/poweroff		controllers.VMOperation.destroy(vmName : String, hostName : String)
 #delete signal
 GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 #attach device
@@ -40,6 +40,15 @@ POST /storage/pool/create		controllers.Storage.createStoragePool(hostName : Stri
 GET /storage/pool/delete		controllers.Storage.deleteStoragePool(hostName : String, poolName : String )
 POST /storage/vol/create		controllers.Storage.createStorageVol(hostName : String, poolName : String)
 GET /storage/vol/delete		controllers.Storage.deleteStorageVol(hostName : String, poolName : String, volName : String )
+
+#start network
+GET	 /network/start		controllers.Network.startNW(netName: String, hostName : String)
+#stop network
+GET	 /network/stop		controllers.Network.stopNW(netName : String, hostName : String)
+#delete network
+GET	 /network/delete		controllers.Network.deleteNW(netName : String, hostName : String)
+GET	 /network			controllers.Network.listNW()
+POST	 /network/create		controllers.Network.createNW()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
