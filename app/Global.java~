@@ -40,17 +40,7 @@ public class Global extends GlobalSettings {
 					" hostName VARCHAR(255) NOT NULL, " + 
 					" PRIMARY KEY ( hostIP ))"; 
 			stmt.executeUpdate(sql);
-			sql = "CREATE TABLE IF NOT EXISTS Network " +
-	                "(name VARCHAR(255) NOT NULL, " +
-	                "host VARCHAR(255) NOT NULL, " + 
-	                "mode  VARCHAR(15), " +
-	                "bridgename  VARCHAR(255),"+
-	                "autostart VARCHAR(5) NOT NULL ,"+
-	                "PRIMARY KEY(name))"; 
-	                
-	    	if((stmt.executeUpdate(sql))<0)
-	    		System.out.println("Created NETWORK table in given database...");	
-
+			
 			sql = "CREATE TABLE IF NOT EXISTS snapshot " +
 					"(vmuuid VARCHAR(255) NOT NULL, " +
 					" path VARCHAR(255) NOT NULL, "+

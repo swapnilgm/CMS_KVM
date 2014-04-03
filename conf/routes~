@@ -40,17 +40,6 @@ GET /storage/pool/list/:hostName		controllers.Strorage.listStoragePool(hostName 
 GET /storage/vol/list/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)
 #GET /storage/pool/create/:hostName		controllers.Strorage.createStoragePool()
 GET /storage/pool/delete/:hostName		controllers.Strorage.deleteStoragePool(hostName : String, poolName : String )
-#start network
-GET	 /network/start		controllers.NetworkOp.startNW(netName: String, hostName : String)
-#stop network
-GET	 /network/stop		controllers.NetworkOp.stopNW(netName : String, hostName : String)
-#delete network
-GET	 /network/delete		controllers.NetworkOp.deleteNW(netName : String, hostName : String)
-
-GET	 /network			controllers.NetworkOp.listNW()
-
-POST	 /network/create		controllers.NetworkOp.createNW()
-
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
