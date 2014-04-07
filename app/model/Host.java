@@ -1,3 +1,4 @@
+
 package model;
 
 import java.io.File;
@@ -18,12 +19,13 @@ public class Host {
 	
 	public Connect conn;
 	//private String hostIP;
-	//private string hostName;
+	private String hostName;
 	
-	public Host(String hostName) throws LibvirtException, SQLException  {
+	public Host(String hostNm) throws LibvirtException, SQLException  {
 		
 		String hostIP=null;
 		Dba d=new Dba();
+		hostName=hostNm;
 		hostIP=d.getIP(hostName);
 		d.close();
 		ConnectAuth ca= new ConnectAuthDefault();
@@ -45,8 +47,14 @@ public class Host {
 	
 	public JsonNode getHostInfo() throws LibvirtException
 	{
-		JsonNode js=Json.toJson(this.conn.nodeInfo());
-		return js;
+	//	ObjectNode on=Json.newObject();
+		NodeInfo ni=this.conn.nodeInfo();
+	//	on.put(ni.model, )
+	//	int noOfPools=this.conn.numOfDefinedStoragePools()+this.conn.numOfStoragePools();
+	//	int noOfVM=this.conn.numOfDefinedDomains()+this.conn.numOfDomains();
+	//	int noOfNetwork=this.conn.numOfDefinedNetworks()+this.conn.numOfNetworks();
+		
+		return Json.toJson(ni);
 		
 	}
 	
@@ -155,39 +163,6 @@ public class Host {
 		}
 		
 		
-		/*
-      case "hd": xml=xml.concat("<disk type='volume' device='disk'>"+
-    		  "<driver name='qemu' type='raw'/>"+
-    		  "<source pool='iscsi' volume='unit:0:0:1' />"+
-    		  "<target dev='vda' bus='virtio'/>"+
-       		  "</disk>");
-    	  
-    	  /*xml=xml.concat("<disk type='volume' device='disk'>"+
-    		  "<source file='"+json.findPath("disk").asText()+"/>"+
-    		  "<target dev='hda'/>"+
-    	      "</disk>");*/
-		/*
-      break;
-      case "network": xml=xml.concat("<disk type='network' device='cdrom'>"+
-    		  "<source protocol='iscsi' name='iqn.2014-01.com.cmskvm:storage-server/1'>"+
-    		  "<host name='192.168.43.89' port='3260'/>"+
-    		  "</source>"+
-    		  "<target dev='hdc'/>"+
-    		  "<readonly/>"+
-    		  "</disk>");
-      
-      break;
-      case "volume": xml=xml.concat("<disk type='volume' device='disk'>"+
-    		  "<source pool='aslk' volume='unit:0:0:1' mode='direct'/>"+
-    		  "<target dev='vda' bus='virtio'/>"+
-       		  "</disk>");
-      
-      break;
-
-	default:
-		break;
-	}*/
-		
 		xml=xml.concat("<interface type='network'>"+
 				"<source network='default'/>"+
 				"</interface>"+
@@ -218,7 +193,7 @@ public class Host {
 		
 	}
 	
-	public  int createStoragePool(JsonNode json)throws LibvirtException {
+	public  int createStoragePool(JsonNode json)throws LibvirtException, SQLException {
 		String xmldesc=new String();
 		String remoteHostName=json.findPath("remoteHostName").asText();
 		String poolName=json.findPath("poolName").asText();
@@ -226,7 +201,7 @@ public class Host {
 			if(conn.storagePoolLookupByName(poolName)!=null)
 				return -3;
 		} catch (LibvirtException e) {
-			e.printStackTrace();    		
+			//System.out.println(e.getMessage());    		
 		}
 		
 		String storPath=json.findPath("storPath").asText();
@@ -249,33 +224,46 @@ public class Host {
     		{
     			System.out.println("unable to create directory");
     			return -1;
-    		}
-    		
-			 */	xmldesc=xmldesc.concat("<dir path=\"" + storPath + "\"/>"
-					 +"</source>"
-					 +"<target>"
-					 +"<path>/var/lib/libvirt/images</path>");
-		}
-		else return -2;
-		xmldesc=xmldesc.concat("</target></pool>");    	
-		
-		StoragePool stp=conn.storagePoolDefineXML(xmldesc, 0);
-		if(stp==null){    		
-			return -1;
-		} else {
-			
-			try {
-				stp.create(0);
+    		}    		
+			 */
+			Dba d=new Dba();
+			int storeID = d.getStoreID(hostName);
+			if(storeID<4) {
 				
-			} catch (LibvirtException e) {
-				// TODO Auto-generated catch block
-				System.out.println(e.getMessage());
-				stp.undefine();
-				return 0;
+				xmldesc=xmldesc.concat("<dir path=\"" + storPath + "\"/>"
+						+"</source>"
+						+"<target>"
+						+"<path>/media/nfs/stor"+storeID+"</path>");
 			}
-			stp.setAutostart(1);
-			stp.free();
-			return 1;
+			else return -4;	//no more storage location
+		}
+		else return -2;	//invalid source disk type
+		xmldesc=xmldesc.concat("</target></pool>");    	
+		try {
+			StoragePool stp=conn.storagePoolDefineXML(xmldesc, 0);
+			if(stp==null){    		
+				return -1;
+			} else {				
+				try {
+					stp.create(0);
+					stp.setAutostart(1);
+					
+				} catch (LibvirtException e) {
+					// TODO Auto-generated catch block
+					System.out.println(e.getMessage());
+					stp.undefine();
+					return 0;
+				}
+				stp.free();
+				return 1;
+			}
+		}catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			if(e.getError().getCode().ordinal()==9){
+				System.out.println(e.getMessage());
+				return -9;
+			}
+			return 0;
 		}
 	}    	
 	

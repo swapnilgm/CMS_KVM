@@ -3,6 +3,8 @@ package model;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.xml.xpath.XPath;
+
 import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
 import org.libvirt.StorageVol;
@@ -32,6 +34,7 @@ public class StorageDisk {
 		if(stv!=null)
 			stv.free();
 	}
+	
 	static public boolean isPoolExist(String hostName, String poolName)
 			throws LibvirtException, SQLException {
 		Host tempHost = new Host(hostName);
@@ -45,14 +48,38 @@ public class StorageDisk {
 		
 		String xmlDesc=new String();
 		String volName=json.findPath("volName").asText();
-    	String capacity=json.findPath("capacity").asText();
+    	int capacity=json.findPath("capacity").asInt();
     	//String storPath=json.findPath("capacity").asText();
+    	String poolXML=stp.getXMLDesc(1);
+    	//System.out.println(poolXML);
+    	//xml parsing to get storage pool path
+    	int startIndex=poolXML.indexOf("type='");
+    	System.out.println("si="+startIndex);
+		//			<pool type='netfs'>
+
+    	int lastIndex=poolXML.indexOf("'>",startIndex+6);
+    	System.out.println("li="+lastIndex);
+    	String path=poolXML.substring(startIndex+6, lastIndex);
+    	System.out.println("path="+path);
+		
+		//check type iscsi or netfs
+		if(path.compareToIgnoreCase("iscsi")==0)
+			return -2;
+
+    	startIndex=poolXML.indexOf("<target>");
+    	//System.out.println("si="+startIndex);
+    	startIndex=poolXML.indexOf("<path>",startIndex);
+    	//System.out.println("si="+startIndex);
+    	lastIndex=poolXML.indexOf("</path>",startIndex+6);
+    	//System.out.println("li="+lastIndex);
+    	path=poolXML.substring(startIndex+6, lastIndex);
+    //	System.out.println("path="+path);
     	xmlDesc=xmlDesc.concat("<volume>"
     			+ "<name>" +volName +"</name>"
         +"<allocation>0</allocation>"
         +"<capacity unit=\"G\">" + capacity + "</capacity>"
         +"<target>"
-          +"<path>" + "/var/lib/libvirt/images/" + volName + ".img" + "</path>"
+          +"<path>" + path + volName + ".img" + "</path>"
           +"<permissions>"
             +"<owner>107</owner>"
             +"<group>107</group>"
@@ -82,9 +109,21 @@ public class StorageDisk {
 		if(stp==null){    		
 			return -2;
 		} else {	
-			String xmlDesc = stp.getXMLDesc(1);
+			String poolXML=stp.getXMLDesc(1);
+	    	//System.out.println(poolXML);
+	    	//xml parsing to get storage pool path
+			int startIndex=poolXML.indexOf("type='");
+	    	System.out.println("si="+startIndex);
+			//			<pool type='netfs'>
+
+	    	int lastIndex=poolXML.indexOf("'>",startIndex+6);
+	    	System.out.println("li="+lastIndex);
+	    	String path=poolXML.substring(startIndex+6, lastIndex);
+	    	System.out.println("path="+path);
+			
 			//check type iscsi or netfs
-			System.out.println(xmlDesc);
+			if(path.compareToIgnoreCase("iscsi")==0)
+				return -2;
 			stv=stp.storageVolLookupByName(volName);
 			if(stv==null){
 				return -1;

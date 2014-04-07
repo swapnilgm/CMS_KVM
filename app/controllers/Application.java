@@ -130,6 +130,15 @@ public class Application extends Controller {
 				System.out.println("Expecting vmname data");	
 				return badRequest("Missing parameter [vmName]");
 			} else {
+				try {
+					if(tempHost.validVMName(vmName)){
+						return notFound("VM "+vmName+" already exist.");
+					}
+				} catch (LibvirtException e) {
+					// TODO Auto-generated catch block
+					System.out.println(e.getMessage());
+					return internalServerError("Oops unable to connect to host");
+				}
 				int vcpu = json.findPath("vcpu").intValue();
 				if(vcpu == 0) {
 					System.out.println("Expecting vcpu data");

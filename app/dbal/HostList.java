@@ -34,7 +34,7 @@ public class HostList extends TimerTask {
 		PreparedStatement pstmt;
 		Statement stmt;
 		ResultSet rs;
-		boolean found;
+		boolean found, active;
 		Properties defaultProps = new Properties();
 		FileInputStream in;
 		
@@ -55,7 +55,7 @@ public class HostList extends TimerTask {
 			rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+local+"'");
 			if (rs.next()) {
 				if(rs.getInt("total")==0){					
-					stmt.executeUpdate("INSERT INTO Host VALUES('"+local+"','"+local+"')");
+					stmt.executeUpdate("INSERT INTO Host VALUES('"+local+"','"+local+"','0','0','0','1')");
 				}
 			}
 			rs.close();
@@ -70,16 +70,20 @@ public class HostList extends TimerTask {
 				if(dbConn==null)
 					dbConn = DB.getConnection();
 				stmt=dbConn.createStatement();
-				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?)");
+				pstmt=dbConn.prepareStatement("INSERT INTO Host VALUES(?,?,'0','0','0','1')");
+				
+				//probe each machine in subnet
 				for (String hostIP : compList) {
-					//hostIP=subnet + "." + i;
-					
-					rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostIP = '"+hostIP+"'");
+					//check if its already in db					
+					rs=stmt.executeQuery("SELECT active FROM Host WHERE hostIP = '"+ hostIP +"'");
 					if (rs.next()) {
-						found=rs.getBoolean("total");
+						found=true;
+						active=rs.getBoolean("active");
 					}
-					else
+					else {
 						found=false;
+						active=false;
+					}
 					try {
 						if (InetAddress.getByName(hostIP).isReachable(TIMEOUT)){
 							//System.out.println("Connecting to libvirt on :: "+ hostIP);
@@ -88,23 +92,31 @@ public class HostList extends TimerTask {
 							conn=new Connect(hostURI,ca,0); //connecting to hypervisor		    
 							if (conn.isConnected()){
 								if(!found){
+									//if not there in db, add new entry 
 									pstmt.setString(1, hostIP);
 									pstmt.setString(2, conn.getHostName());
 									if(pstmt.executeUpdate()>0){
 										System.out.println("Host "+hostIP+ " up.");
 									}
 								}
+								else if (!active) {								
+									//logically activate
+									stmt.executeUpdate("UPDATE Host set active = '1' WHERE hostIP = '"+hostIP+"'");
+									System.out.println("Host "+ hostIP +" up.");
+								}
 								conn.close();
 								
 							}else {
 								if(found){
-									stmt.executeUpdate("DELETE FROM Host WHERE hostIP = '"+hostIP+"'");
+									//delete logically
+									stmt.executeUpdate("UPDATE Host set active = '0' WHERE hostIP = '"+hostIP+"'");
 									System.out.println("Host "+ hostIP +" down.");
 								}
 							}
 						}else {
-							if(found){
-								stmt.executeUpdate("DELETE FROM Host WHERE hostIP = '"+hostIP+"'");
+							if(found){ 
+								//delete logically
+								stmt.executeUpdate("UPDATE Host SET active= '0' WHERE hostIP = '"+hostIP+"'");
 								System.out.println("Host "+hostIP+ " down.");
 							}
 						}

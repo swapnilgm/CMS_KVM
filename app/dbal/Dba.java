@@ -1,3 +1,4 @@
+
 package dbal;
 
 import java.sql.Connection;
@@ -27,7 +28,7 @@ public class Dba {
 	
 	public String getIP(String hostName) throws SQLException {
 		String hostIP=null;		
-		String query="SELECT hostIP FROM Host WHERE hostName = '"+ hostName+"'";
+		String query="SELECT hostIP FROM Host WHERE hostName = '"+ hostName+"' AND active = '1'";
 		rs = stmt.executeQuery(query);
 		if(rs.next()){
 			hostIP=rs.getString("hostIP");
@@ -43,7 +44,7 @@ public class Dba {
 		
 		ArrayList<String> hostList;
 		stmt=dbConn.createStatement();
-		String query="SELECT hostName FROM Host";
+		String query="SELECT hostName FROM Host where active = '1'";
 		rs = stmt.executeQuery(query);
 		hostList=new ArrayList<String>();
 		while(rs.next()){
@@ -54,7 +55,8 @@ public class Dba {
 	}
 	
 	public boolean ishostExist(String hostName) throws SQLException {
-		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host WHERE hostName = '"+hostName+"'");
+		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Host " +
+				"WHERE hostName = '"+hostName+"' AND active = '1' ");
 		if(rs.next()) {
 			if(rs.getInt("total")!=0) {
 				rs.close();
@@ -90,6 +92,37 @@ public class Dba {
 		return;
 	}
 	 */	
+	public int getStoreID (String hostName) throws SQLException {
+		Boolean storeID=null;		
+		String query="SELECT nfs1,nfs2,nfs3 FROM Host WHERE hostName = '"+ hostName+"' AND active = '1'";
+		rs = stmt.executeQuery(query);
+		if(rs.next()){
+			storeID=rs.getBoolean(1);
+			if(storeID) {
+				storeID=rs.getBoolean(2);
+				if(storeID) {
+					storeID=rs.getBoolean(3);
+					if(storeID) {
+						rs.close();
+						return 4;
+					} else {
+						rs.close();
+						return 3;
+					}
+				} else {
+					rs.close();
+					return 2;
+				}
+			} else {
+				rs.close();
+				return 1;
+			}				
+			
+		} else {		
+			rs.close();
+			return 0;
+		}			
+	}
 	public boolean isName(String name) throws SQLException {
 		rs=stmt.executeQuery("SELECT COUNT(*) AS total FROM Network WHERE NAME = '"+name+"'");
 		if(rs.next()) {

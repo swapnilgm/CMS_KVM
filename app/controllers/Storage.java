@@ -61,12 +61,19 @@ public class Storage extends Controller{
 							} 
 							
 							try {
-								if(tempHost.createStoragePool(json)==-1){
+								int res=tempHost.createStoragePool(json);
+								if(res==-1){
 									tempHost.close();
 									return internalServerError("Server error");
-								}else if(tempHost.createStoragePool(json)==0){
+								}else if(res==0){
 									tempHost.close();
 									return badRequest("No iscsi target found.");
+								}else if(res==-3){
+									tempHost.close();
+									return badRequest("No iscsi target found.");
+								}else if(res==-9){
+									tempHost.close();
+									return badRequest("pool already exist with same NFS source.");
 								} else {
 									tempHost.close();
 									return created("pool created.");
@@ -75,6 +82,10 @@ public class Storage extends Controller{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								return internalServerError("Pool create time error");
+							}  catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								return internalServerError("Oops database connection error");
 							}		
 						}
 					}
@@ -145,8 +156,8 @@ public class Storage extends Controller{
 				System.out.println("Expecting volname data");	
 				return badRequest("Missing parameter [volName]");
 			} else {				
-				String capacity = json.findPath("capacity").textValue();
-				if(capacity == null) {
+				int capacity = json.findPath("capacity").intValue();
+				if(capacity == 0) {
 					System.out.println("Expecting capacity data");
 					return badRequest("Missing parameter [capacity]");
 				} else {
@@ -158,7 +169,9 @@ public class Storage extends Controller{
 					st.close();
 					
 					if(res==-1){
-						return internalServerError("Pool not found");
+						return notFound("Pool not found");
+					}if(res==-2){
+						return badRequest("Cannot create volume on iscsi pool.");
 					}else if (res==0) {
 						return ok("vol not created");
 					}else{
@@ -204,7 +217,9 @@ public class Storage extends Controller{
 			st.close();
 			
 			if(res==-1){
-				return internalServerError("vol not found");
+				return notFound("vol not found");
+			}else if (res==-2) {
+				return badRequest("cannot delete volume on iscsi pool.");
 			}else{
 				return ok("vol deleted");
 			}

@@ -14,15 +14,12 @@ public class Global extends GlobalSettings {
 	public void onStart(Application app) {
 
 		initDB();
-		//get subnet
-//		HostList.subnet="10.42.0";
+		
 		Timer nwHostProber=new Timer(true);
 		nwHostProber.schedule(new HostList(), 1000);
 		Timer nwVMProber=new Timer(true);
 		nwVMProber.schedule(new VMStatus(), 1000);
-		//new Thread(new HostList()).start();
-	//new Thread(new VMStatus()).start();
-		
+			
 	}
 	
 	private void initDB() {
@@ -37,7 +34,11 @@ public class Global extends GlobalSettings {
 			stmt= dbConn.createStatement();
 			String sql="CREATE TABLE IF NOT EXISTS Host " +
 					"(hostIP VARCHAR(255), " + 
-					" hostName VARCHAR(255) NOT NULL, " + 
+					" hostName VARCHAR(255) NOT NULL, " +
+					"nfs1	BOOLEAN NOT NULL, " +
+					"nfs2	BOOLEAN NOT NULL, " +
+					"nfs3	BOOLEAN NOT NULL, " +
+					"active BOOLEAN NOT NULL, " +
 					" PRIMARY KEY ( hostIP ))"; 
 			stmt.executeUpdate(sql);
 			stmt.executeUpdate("TRUNCATE TABLE Host");
@@ -54,9 +55,9 @@ public class Global extends GlobalSettings {
 					" cpu DECIMAL(5,2) NOT NULL, "+
 					" memory DECIMAL(5,2) NOT NULL "+					
 					") WITH OIDS";
-			//		" time DATETIME NOT NULL)";
+			stmt.executeUpdate("TRUNCATE TABLE VM");
 			if((stmt.executeUpdate(sql))<0)
-				System.out.println("Created vmSaveSnapshot table in given database...");
+				System.out.println("Created vm table in given database...");
 			sql = "CREATE TABLE IF NOT EXISTS Network " +
 	                "(name VARCHAR(255) NOT NULL, " +
 	                "host VARCHAR(255) NOT NULL, " + 
@@ -68,7 +69,6 @@ public class Global extends GlobalSettings {
 	    	if((stmt.executeUpdate(sql))<0)
 	    		System.out.println("Created NETWORK table in given database...");	
 
-			stmt.executeUpdate("TRUNCATE TABLE VM");
 			stmt.close();
 			dbConn.close();
 			
