@@ -45,55 +45,63 @@ public class StorageDisk {
 	}
 	
 	public int createStorageVol (JsonNode json) throws LibvirtException {
-		
 		String xmlDesc=new String();
 		String volName=json.findPath("volName").asText();
-    	int capacity=json.findPath("capacity").asInt();
-    	//String storPath=json.findPath("capacity").asText();
-    	String poolXML=stp.getXMLDesc(1);
-    	//System.out.println(poolXML);
-    	//xml parsing to get storage pool path
-    	int startIndex=poolXML.indexOf("type='");
-    	System.out.println("si="+startIndex);
-		//			<pool type='netfs'>
-
-    	int lastIndex=poolXML.indexOf("'>",startIndex+6);
-    	System.out.println("li="+lastIndex);
-    	String path=poolXML.substring(startIndex+6, lastIndex);
-    	System.out.println("path="+path);
-		
-		//check type iscsi or netfs
-		if(path.compareToIgnoreCase("iscsi")==0)
-			return -2;
-
-    	startIndex=poolXML.indexOf("<target>");
-    	//System.out.println("si="+startIndex);
-    	startIndex=poolXML.indexOf("<path>",startIndex);
-    	//System.out.println("si="+startIndex);
-    	lastIndex=poolXML.indexOf("</path>",startIndex+6);
-    	//System.out.println("li="+lastIndex);
-    	path=poolXML.substring(startIndex+6, lastIndex);
-    //	System.out.println("path="+path);
-    	xmlDesc=xmlDesc.concat("<volume>"
-    			+ "<name>" +volName +"</name>"
-        +"<allocation>0</allocation>"
-        +"<capacity unit=\"G\">" + capacity + "</capacity>"
-        +"<target>"
-          +"<path>" + path + volName + ".img" + "</path>"
-          +"<permissions>"
-            +"<owner>107</owner>"
-            +"<group>107</group>"
-            +"<mode>0744</mode>"
-            +"<label>virt_image_t</label>"
-          +"</permissions>"
-        +"</target>"
-      +"</volume>");
-         	
-    	if(stp==null){    		
-    		return -1;    		
-    	} else {
-    		//check type iscsi or netfs
-    			stv=stp.storageVolCreateXML(xmlDesc, 0);
+		int capacity=json.findPath("capacity").asInt();
+		try {
+			stv=stp.storageVolLookupByName(volName);
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());			
+		}
+		if(stv!=null){
+			return -3;
+		} else{
+			//String storPath=json.findPath("capacity").asText();
+			String poolXML=stp.getXMLDesc(1);
+			//System.out.println(poolXML);
+			//xml parsing to get storage pool path
+			int startIndex=poolXML.indexOf("type='");
+			System.out.println("si="+startIndex);
+			//			<pool type='netfs'>
+			
+			int lastIndex=poolXML.indexOf("'>",startIndex+6);
+			//System.out.println("li="+lastIndex);
+			String path=poolXML.substring(startIndex+6, lastIndex);
+			//System.out.println("path="+path);
+			
+			//check type iscsi or netfs
+			if(path.compareToIgnoreCase("iscsi")==0)
+				return -2;
+			
+			startIndex=poolXML.indexOf("<target>");
+			//System.out.println("si="+startIndex);
+			startIndex=poolXML.indexOf("<path>",startIndex);
+			//System.out.println("si="+startIndex);
+			lastIndex=poolXML.indexOf("</path>",startIndex+6);
+			//System.out.println("li="+lastIndex);
+			path=poolXML.substring(startIndex+6, lastIndex);
+			//	System.out.println("path="+path);
+			xmlDesc=xmlDesc.concat("<volume>"
+					+ "<name>" +volName+".img" +"</name>"
+					+"<allocation>0</allocation>"
+					+"<capacity unit=\"K\">" + capacity + "</capacity>"
+					+"<target>"
+					+"<path>" + path + volName + ".img" + "</path>"
+					+"<permissions>"
+					+"<owner>107</owner>"
+					+"<group>107</group>"
+					+"<mode>0744</mode>"
+					+"<label>virt_image_t</label>"
+					+"</permissions>"
+					+"</target>"
+					+"</volume>");
+			
+			if(stp==null){    		
+				return -1;    		
+			} else {
+				//check type iscsi or netfs
+				stv=stp.storageVolCreateXML(xmlDesc, 0);
 				if(stv==null){
 					return 0;
 				} else{
@@ -101,8 +109,9 @@ public class StorageDisk {
 					return 1;
 				}
 			} 
-    	}
-        	
+		}
+	}
+	
 	
 	public int deleteStorageVol(String volName) throws LibvirtException {
 		
@@ -110,21 +119,26 @@ public class StorageDisk {
 			return -2;
 		} else {	
 			String poolXML=stp.getXMLDesc(1);
-	    	//System.out.println(poolXML);
-	    	//xml parsing to get storage pool path
+			//System.out.println(poolXML);
+			//xml parsing to get storage pool path
 			int startIndex=poolXML.indexOf("type='");
-	    	System.out.println("si="+startIndex);
+			System.out.println("si="+startIndex);
 			//			<pool type='netfs'>
-
-	    	int lastIndex=poolXML.indexOf("'>",startIndex+6);
-	    	System.out.println("li="+lastIndex);
-	    	String path=poolXML.substring(startIndex+6, lastIndex);
-	    	System.out.println("path="+path);
+			
+			int lastIndex=poolXML.indexOf("'>",startIndex+6);
+			System.out.println("li="+lastIndex);
+			String path=poolXML.substring(startIndex+6, lastIndex);
+			System.out.println("path="+path);
 			
 			//check type iscsi or netfs
 			if(path.compareToIgnoreCase("iscsi")==0)
 				return -2;
+			try {
 			stv=stp.storageVolLookupByName(volName);
+			} catch (LibvirtException e) {
+				System.out.println(e.getMessage());
+			}
+			
 			if(stv==null){
 				return -1;
 			} else{

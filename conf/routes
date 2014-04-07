@@ -17,32 +17,32 @@ GET     /vm/list/runtime      controllers.Application.getDynamicList(hostName : 
 POST  /vm/create			controllers.Application.createVM(hostName : String)
 POST  /vm/create/validate			controllers.Application.validateVMName(hostName : String,vmName: String)
 #start vm
-GET	 /vm/start		controllers.VMOperation.start(vmName : String, hostName : String)
+PUT  /vm/start		controllers.VMOperation.start(vmName : String, hostName : String)
 #send shutdown signal to vm
-GET	 /vm/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
+PUT  /vm/shutdown		controllers.VMOperation.shutdown(vmName : String, hostName : String)
 #reboot host
-GET	 /vm/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
+PUT  /vm/reboot		controllers.VMOperation.reboot(vmName : String, hostName : String)
 #pause vm
-GET	 /vm/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
+PUT  /vm/suspend		controllers.VMOperation.suspend(vmName : String, hostName : String)
 #resume vm
-GET	 /vm/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
+PUT  /vm/resume		controllers.VMOperation.resume(vmName : String, hostName : String)
 #power off signal
-GET	 /vm/poweroff		controllers.VMOperation.destroy(vmName : String, hostName : String)
+PUT  /vm/poweroff		controllers.VMOperation.destroy(vmName : String, hostName : String)
 #delete signal
-GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
+DELETE  /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 #attach device
-GET	 /vm/addVol		controllers.VMOperation.attachStorage(hostName : String, vmName : String,poolName : String,volName : String)
+POST  /vm/addDisk		controllers.VMOperation.attachStorage(hostName : String, vmName : String,poolName : String,volName : String)
 
 #storage
 GET /storage/pool/list		controllers.Storage.listStoragePool(hostName : String, filter: Int)
 GET /storage/vol/list			controllers.Storage.listStorageVol(hostName : String, poolName : String)
 POST /storage/pool/create		controllers.Storage.createStoragePool(hostName : String)
-GET /storage/pool/delete		controllers.Storage.deleteStoragePool(hostName : String, poolName : String )
+DELETE /storage/pool/delete		controllers.Storage.deleteStoragePool(hostName : String, poolName : String )
 POST /storage/vol/create		controllers.Storage.createStorageVol(hostName : String, poolName : String)
-GET /storage/vol/delete		controllers.Storage.deleteStorageVol(hostName : String, poolName : String, volName : String )
+DELETE /storage/vol/delete		controllers.Storage.deleteStorageVol(hostName : String, poolName : String, volName : String )
 
 #start network
-GET	 /network/start		controllers.Network.startNW(netName: String, hostName : String)
+POST GET	 /network/start		controllers.Network.startNW(netName: String, hostName : String)
 #stop network
 GET	 /network/stop		controllers.Network.stopNW(netName : String, hostName : String)
 #delete network

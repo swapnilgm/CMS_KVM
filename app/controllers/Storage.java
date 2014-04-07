@@ -170,8 +170,10 @@ public class Storage extends Controller{
 					
 					if(res==-1){
 						return notFound("Pool not found");
-					}if(res==-2){
+					}else if(res==-2){
 						return badRequest("Cannot create volume on iscsi pool.");
+					}else if(res==-3){
+						return badRequest("Vol already exist.");
 					}else if (res==0) {
 						return ok("vol not created");
 					}else{
