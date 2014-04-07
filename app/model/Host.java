@@ -47,14 +47,21 @@ public class Host {
 	
 	public JsonNode getHostInfo() throws LibvirtException
 	{
-	//	ObjectNode on=Json.newObject();
+		ObjectNode on=Json.newObject();
 		NodeInfo ni=this.conn.nodeInfo();
-	//	on.put(ni.model, )
-	//	int noOfPools=this.conn.numOfDefinedStoragePools()+this.conn.numOfStoragePools();
-	//	int noOfVM=this.conn.numOfDefinedDomains()+this.conn.numOfDomains();
-	//	int noOfNetwork=this.conn.numOfDefinedNetworks()+this.conn.numOfNetworks();
+		on.put("model",ni.model);
+		on.put("CPU",ni.cpus);
+		on.put("Memory",ni.memory);
+		on.put("Speed",ni.mhz);
+		on.put("Threads",ni.threads);
+		int noOfPools=this.conn.numOfDefinedStoragePools()+this.conn.numOfStoragePools();
+		int noOfVM=this.conn.numOfDefinedDomains()+this.conn.numOfDomains();
+		int noOfNetwork=this.conn.numOfDefinedNetworks()+this.conn.numOfNetworks();
+		on.put("Pools",noOfPools);
+		on.put("VM",noOfVM);
+		on.put("Networks",noOfNetwork);
 		
-		return Json.toJson(ni);
+		return Json.toJson(on);
 		
 	}
 	
@@ -140,6 +147,7 @@ public class Host {
 				"<emulator>/usr/bin/kvm-spice</emulator>");
 		
 		//disk device floppy", "disk", "cdrom
+
 		if(bootDev.compareTo("cdrom")==0)
 		{
 			//case "fd": xml=xml.concat("<disk type='file' device='floppy'>");
@@ -178,6 +186,7 @@ public class Host {
 					vm.create();
 					return 1;
 				}
+
 				else return 0;
 			}
 			else{
@@ -190,7 +199,6 @@ public class Host {
 			
 			return -1;
 		}
-		
 	}
 	
 	public  int createStoragePool(JsonNode json)throws LibvirtException, SQLException {
@@ -432,6 +440,7 @@ public class Host {
 		db.close();
 		return found; 
 	}
+
 	
 	public int createNetwork(JsonNode json)  
 	{
@@ -462,7 +471,7 @@ public class Host {
 		xml=xml.concat("<name>"+name+"</name>");   
 		xml=xml.concat("	<bridge name='"+bridgeName+"' stp='on' delay='0'/>");
 		/*	
-     <domain name='example.com'/>
+	<domain name='example.com'/>
      <dns>
           <txt name='example' value='example value' />
           <forwarder addr='8.8.8.8'/>
@@ -484,6 +493,7 @@ public class Host {
 		case 4:xml=xml.concat("dev='dial up' "); break;
 		case 5:xml=xml.concat("dev='vpn' "); break;
 	}	
+
 		 */
 		xml=xml.concat("mode='");
 		String mode1=new String();
@@ -597,7 +607,7 @@ public class Host {
 			System.out.println(e.getMessage());
 			return 0;}
 	}
-	
+
 	/*
 	private enum ListVMFilter {
 	LIST_VM_FILTER, ACTIVE_VM_FILTER, DEFINED_VM_FILTER

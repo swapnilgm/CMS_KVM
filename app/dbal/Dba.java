@@ -6,6 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import play.libs.Json;
+import org.libvirt.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.libvirt.LibvirtException;
 import org.libvirt.Network;
@@ -91,6 +95,7 @@ public class Dba {
 		stmt.executeUpdate("DELETE FROM Host WHERE hostIP = '"+hostIP+"'");
 		return;
 	}
+
 	 */	
 	public int getStoreID (String hostName) throws SQLException {
 		Boolean storeID=null;		
@@ -136,8 +141,6 @@ public class Dba {
 		}
 		rs.close();
 		return false;					
-		
-		
 	}
 	
 	
@@ -145,15 +148,13 @@ public class Dba {
 	public void addNetwork(String name, String hostName, String mode, String bridgeName, String autostart) throws SQLException {
 		stmt.executeUpdate("INSERT INTO Network VALUES('"+name+"','"+hostName+"','"+mode+"','"+ bridgeName+"','"+ autostart+"')");
 		
-		
 	}
-	
 	
 	public void deleteNetwork(String name) throws SQLException {
 		stmt.executeUpdate("DELETE FROM Network WHERE NAME = '"+name+"'");
 		
 	}
-	
+
 	public ArrayList<ObjectNode> getNetList() throws SQLException {
 		
 		ArrayList<ObjectNode> list=new ArrayList<ObjectNode>();
@@ -169,7 +170,7 @@ public class Dba {
 			json.put("mode",rs.getString("MODE"));
 			json.put("bridgename",rs.getString("BRIDGENAME"));
 			json.put("autostart",rs.getString("AUTOSTART"));
-			
+
 			try{
 				Host tempHost=new Host(rs.getString("HOST"));
 				Network net=tempHost.conn.networkLookupByName(rs.getString("NAME"));
@@ -192,6 +193,7 @@ public class Dba {
 			finally{
 				list.add(json);
 				json=null;
+
 				
 			}
 		}

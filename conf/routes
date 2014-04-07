@@ -34,6 +34,7 @@ DELETE  /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : S
 POST  /vm/addDisk		controllers.VMOperation.attachStorage(hostName : String, vmName : String,poolName : String,volName : String)
 
 #storage
+
 GET /storage/pool/list		controllers.Storage.listStoragePool(hostName : String, filter: Int)
 GET /storage/vol/list			controllers.Storage.listStorageVol(hostName : String, poolName : String)
 POST /storage/pool/create		controllers.Storage.createStoragePool(hostName : String)
@@ -42,7 +43,7 @@ POST /storage/vol/create		controllers.Storage.createStorageVol(hostName : String
 DELETE /storage/vol/delete		controllers.Storage.deleteStorageVol(hostName : String, poolName : String, volName : String )
 
 #start network
-POST GET	 /network/start		controllers.Network.startNW(netName: String, hostName : String)
+GET	 /network/start		controllers.Network.startNW(netName: String, hostName : String)
 #stop network
 GET	 /network/stop		controllers.Network.stopNW(netName : String, hostName : String)
 #delete network

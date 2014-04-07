@@ -31,6 +31,13 @@ GET	 /vm/destroy		controllers.VMOperation.destroy(vmName : String, hostName : St
 #delete signal
 GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : String)
 <<<<<<< HEAD
+#dynamic usages
+#GET  /vm/:hostName		controllers.Application.getDynamicList(hostName : String)
+#createintg vm
+POST  /create/:hostName			controllers.Application.createVM(hostName : String)
+POST  /create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
+=======
+<<<<<<< HEAD
 
 =======
 #dynamic usages
@@ -39,6 +46,7 @@ GET	 /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : Stri
 #createintg vm
 POST  /vm/create/:hostName			controllers.Application.createVM(hostName : String)
 POST  /vm/create/validate/:hostName			controllers.Application.validateVMName(hostName : String,vmName: String)
+>>>>>>> 06240c280beb35477bbaa1cea692e2f500712668
 #storage
 GET /storage/pool/list/:hostName		controllers.Strorage.listStoragePool(hostName : String, filter: Int)
 GET /storage/vol/list/:hostName			controllers.Strorage.listStorageVol(hostName : String, poolName : String)

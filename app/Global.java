@@ -41,6 +41,7 @@ public class Global extends GlobalSettings {
 					"active BOOLEAN NOT NULL, " +
 					" PRIMARY KEY ( hostIP ))"; 
 			stmt.executeUpdate(sql);
+
 			stmt.executeUpdate("TRUNCATE TABLE Host");
 			sql = "CREATE TABLE IF NOT EXISTS snapshot " +
 					"(vmuuid VARCHAR(255) NOT NULL, " +
