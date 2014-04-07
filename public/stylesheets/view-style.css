@@ -2,6 +2,10 @@
 @import url("pure-min.css");
 @import url("Font-Awesome/css/font-awesome.css");
 
+.unit {
+    font-size: 80%;
+}
+
 #static-list table.inner-table > tbody > tr:hover {
     background-color: #dd9999;
 }
@@ -51,6 +55,15 @@
 
 .inner-table {
     margin: 20px 40px;
+}
+
+#summary .inner-table {
+    border-collapse: collapse;
+    text-align: center;
+}
+.inner-table-header {
+    font-weight: bold;
+    padding: 20px 50px;
 }
 
 .button-bar {
@@ -136,11 +149,12 @@
 }
 #sidebar {
     background-color: silver;
-    width: 200px;
+    width: 18%;
     height: 400px;
     float: left;
     display: inline-block;
     font-size: 120%;
+    overflow: scroll;
 }
 #navbar {
     float: right;
@@ -159,7 +173,8 @@
 #inner-content {
     display: inline-block;
     background-color: rgba( 220, 220, 220, 1.0);
-    width: 1000px;
+    width: 60%;
+    height: 400px;
     float: right;
 }
 #git {
@@ -171,6 +186,48 @@
     color: #395;
 }
 body {
-    margin: 20px 30px;
+    margin: 3% 7%;
     background-color: black;
+}
+
+#storage-bar {
+    background-color: rgba( 220, 220, 220, 1.0);
+    width: 18%;
+    margin-left: 2%;
+    height: 400px;
+    float: left;
+    display: inline-block;
+    font-size: 120%;
+    overflow-y:scroll;
+    overflow-x:scroll;
+}
+.storage-list {
+    padding-left: 6%;
+    list-style: none;
+}
+
+.storage-list li {
+    padding-bottom: 10px;
+}
+.storage-list > li > span{
+    padding-left: 15px;
+}
+
+.storage-list ol {
+    font-size: 100%;
+    padding-left: 30px;
+    margin: 0px;
+}
+
+.circles {
+    display: inline-block;
+    position: relative;
+    top: 12px;
+    left: 10px;
+}
+
+.circles-number,
+.circles-text {
+    padding-left: 0px;
+    font-size: 12px;
 }

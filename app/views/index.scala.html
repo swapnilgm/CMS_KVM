@@ -1,23 +1,26 @@
-@(filter: String)
-<!doctype html>
-<html lang="en">
+    @(filter: String)
+    <!doctype html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/view-style.css")" type="text/css">
-    <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")"></script>
-    <script src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
-    <script src="@routes.Assets.at("javascripts/highcharts.js")"></script>
-    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/create-css.css")">
-    <title>CM Server</title>
-    <script>
-        $("tbody tr").on("click", function( event ) {
-    console.log("row selected");
-    $(".vm-row-selected").removeClass("vm-row-selected");
-    $( this ).addClass("vm-row-selected");
-});
-    </script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/view-style.css")" type="text/css">
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/qtip-min.css")" type="text/css">
+        <script src="@routes.Assets.at("javascripts/jquery-2.0.3.min.js")"></script>
+        <script src="@routes.Assets.at("javascripts/circles.js")"></script>
+        <script src="@routes.Assets.at("javascripts/jquery-ui.js")"></script>
+        <script src="@routes.Assets.at("javascripts/highcharts.js")"></script>
+        <script src="@routes.Assets.at("javascripts/qtip-min.js")"></script>
+        <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/create-css.css")">
+        <title>CM Server</title>
+        <script>
+            $("tbody tr").on("click", function( event ) {
+        console.log("row selected");
+        $(".vm-row-selected").removeClass("vm-row-selected");
+        $( this ).addClass("vm-row-selected");
+    });
+        </script>
+    </head>
 
 <body>
     <div id="top-bar">
@@ -46,6 +49,11 @@
             <ol id="selectable" title="click to select (hold down CTRL for multi-select)">
             </ol>
         </div>
+        <div id="storage-bar">
+            <b style="padding: 5%;">Disks</b><i class="fa fa-refresh icons"></i><i class="fa fa-plus icons"></i><i class="fa fa-times icons"></i>
+            <ol class="storage-list">
+            </ol>
+        </div>
         <div id="inner-content">
             <div class="tab-area">
                 <ul class="tab-list">
@@ -53,105 +61,64 @@
                     <li class="tab" id="tab-2"><a class="tab-text" href="#static-list" title="List all vm's of selected hosts">VMs</a></li>
                     <li class="tab" id="tab-3"><a class="tab-text" href="#network" title="list networks">NETWORKs</a></li>
                     <li class="tab" id="tab-4"><a class="tab-text" href="#monitoring" title="monitor vm's of selected hosts">MONITOR</a></li>
-                    <li class="tab" id="tab-5"><a class="tab-text" href="#storage-list" title="List the storage">DISKs</a></li>
                 </ul>
             </div>
-             <div id="summary">
-                 <div class="button-bar">
-                         <i class="fa fa-refresh fa-2x icons"></i>
-                 </div>
-                 <table class="pure-table inner-table">
-                     <tbody>
-                         <tr>
-                             <td>Model</td>
-                         </tr>
-                         <tr>
-                             <td>Memory</td>
-                         </tr>
-                         <tr>
-                             <td>Cpus</td>
-                         </tr>
-                         <tr>
-                             <td>Speed</td>
-                         </tr>
-                         <tr>
-                             <td>Nodes</td>
-                         </tr>
-                         <tr>
-                             <td>Sockets</td>
-                         </tr>
-                         <tr>
-                             <td>Cores</td>
-                         </tr>
-                         <tr>
-                             <td>Threads</td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <div id="static-list">
-                 <div class="button-bar">
+            <div id="summary">
+                <div class="button-bar">
+                    <i class="fa fa-refresh fa-2x icons"></i>
+                </div>
+                <table class="inner-table">
+                    <tbody>
+                        <tr>
+                            <td class="inner-table-header">Architecture</td>
+                            <td class="inner-table-header">Memory</td>
+                            <td class="inner-table-header">Cpus</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>3</td>
+                            <td>d</td>
+                        </tr>
+                        <tr>
+                            <td class="inner-table-header">Speed</td>
+                            <td class="inner-table-header">Hypervisors</td>
+                            <td class="inner-table-header">Sockets</td>
+                        </tr>
+                        <tr>
+                            <td class="inner-table-header">Cores</td>
+                            <td class="inner-table-header">Threads</td>
+                            <td class="inner-table-header">Pools</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="static-list">
+                <div class="button-bar">
                     <i class="fa fa-play fa-2x icons" title="play vm"></i>
                     <i class="fa fa-stop fa-2x icons" title="shutdown vm"></i>
                     <i class="fa fa-power-off fa-2x icons" title="poweroff vm"></i>
                     <i class="fa fa-refresh fa-2x icons" title="refresh list"></i>
                     <i class="fa fa-times fa-2x icons" title="destroy vm"></i>
-                    <a href="#openModal"><i class="fa fa-plus fa-2x icons" title="create vm"></i></a>
-                    <div id="openModal" class="modalDialog">
-        <div>
-            <a href="#close" title="Close" class="close">X</a>
-
-            <h2>Create VM</h2>
-            <form name="input" method="get">
-                <table align="centre">
-                    <tr>
-                        <td>No. of Virtual CPUs:</td>
-                        <td>
-                            <select name="vcpu">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>RAM(in GB):</td>
-                        <td>
-                            <select name="ram">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </select>
-                        </td>
-                    </tr>
+                    <a href="#createVM">
+                        <i class="fa fa-plus fa-2x icons" title="create vm"></i>
+                    </a>
+            
+                </div>
+                <table class="pure-table inner-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Cores</th>
+                            <th>Memory</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
                 </table>
-
-
-                Choose iso:
-                <input type="file" title="Choose an .iso file to upload" multiple="0" aria-label="Select an .iso">
-                <a href="#submit" title="Submit" class="submit">OK</a>
-            </form>
-
-        </div>
-    </div>
-                 </div>
-                 <table class="pure-table inner-table">
-                     <thead>
-                         <tr>
-                             <th>No.</th>
-                             <th>Id</th>
-                             <th>Name</th>
-                             <th>NoOfCpus</th>
-                             <th>MaxMemory</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                     </tbody>
-                 </table>
-             </div>
-             <div id="network">
+            </div>
+            <div id="network">
                 <div class="button-bar">
                     <i class="fa fa-play fa-2x icons"></i>
                     <i class="fa fa-pause fa-2x icons"></i>
@@ -159,9 +126,9 @@
                     <i class="fa fa-refresh fa-2x icons"></i>
                     <i class="fa fa-times fa-2x icons"></i>
                     <i class="fa fa-plus fa-2x icons"></i>
-                 </div>
-             </div>
-             <div id="monitoring">
+                </div>
+            </div>
+            <div id="monitoring">
                 <div class="button-bar">
                     <i class="fa fa-play fa-2x icons"></i>
                     <i class="fa fa-pause fa-2x icons"></i>
@@ -169,12 +136,76 @@
                     <i class="fa fa-refresh fa-2x icons"></i>
                     <i class="fa fa-times fa-2x icons"></i>
                     <i class="fa fa-plus fa-2x icons"></i>
-                 </div>
+                </div>
                 <div id="container" style=""></div>
-             </div>
+            </div>
         </div>
     </div>
-    
+ <div id="createVM" style="color:#669" class="modalDialog">
+        <div>
+            <a onclick="switch_tab(2)" href="#static-list" title="Close" class="close">X</a>
+
+
+            <form id="vm-form" class="pure-form pure-form-aligned" >
+                <fieldset>
+                    <legend style="left:20px">
+                        <div>
+                        <div style="display:inline-block; margin-left:20px">
+                        <h1 style="color:#669">Create VM</h1></div>
+                        <div style="display:inline-block; margin-right:20px; float:right">
+                        <img id="image" src="@routes.Assets.at("images/Netvibes.png")" width="80px" height="60px"></div></div>
+                    </legend>
+                     <div class="pure-control-group">
+                            <label for="vm-name">VM Name</label>
+                            <input id="vm-name" type="text" placeholder="VM Name" required>
+                        </div>
+                    <div class="pure-control-group">
+                        <label for "vcpu">No. of Virtual CPUs:</label>
+
+                        <select id="vcpu" name="vcpu" class="pure-input-1-2" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="ram">
+                            RAM(in MB):</label>
+
+                        <select id="ram" name="ram" class="pure-input-1-2" required>
+                            <option value="1">512</option>
+                            <option value="2">1024</option>
+                            <option value="3">2048</option>
+                            <option value="4">4096</option>
+                        </select>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="bootdev">Boot Device:</label>
+                        <select id="bootdev" name="bootdev" class="pure-input-1-2" required>
+                            <option value="1">CD-ROM</option>
+                            <option value="2">Hard Disk</option>
+                            <option value="3">Network Boot</option>
+
+                        </select>
+
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="os">Select OS:</label>
+                        <select id="os" name="os" class="pure-input-1-2" required>
+                            <option value="1">windows</option>
+                            <option value="2">ubuntu-13.10-desktop-amd64</option>
+                            <option value="3">ubuntu-13.04-desktop-amd64</option>
+                        </select>
+
+                    </div>
+
+                    <input id="submit-vm" type="submit" class="submit" text="Create"/>
+                </fieldset>
+            </form>
+        </div>
+
+    </div>
 </body>
-<script src="@routes.Assets.at("javascripts/view.js")"></script>
-</html>
+    <script src="@routes.Assets.at("javascripts/view.js")"></script>
+    </html>

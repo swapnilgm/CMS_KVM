@@ -48,7 +48,7 @@ public class Application extends Controller {
 			}
 			else {
 				if(!Host.ishostExist(hostName))
-					return notFound();
+					return notFound("Host "+hostName+" not found.");
 				Host tempHost=new Host(hostName);
 				vmList=tempHost.listVM(filter);
 				tempHost.close();
@@ -58,8 +58,10 @@ public class Application extends Controller {
 			
 			for (Domain vm : vmList) {
 				jso=Json.newObject();
-				jso.put("ID",vm.getID());
 				jso.put("Name",vm.getName());
+				if(vm.isActive()==1)
+					jso.put("Status","Active");
+				else jso.put("Status","InActive");
 				//jso.put("Host",vm.getConnect().getHostName());
 				jso.put("NoOfCPU",vm.getInfo().nrVirtCpu);
 				jso.put("MaxMemory",vm.getMaxMemory());
@@ -88,7 +90,7 @@ public class Application extends Controller {
 			Host tempHost=new Host(hostName);
 			if(tempHost.validVMName(vmName)){
 				tempHost.close();
-				return ok("");
+				return ok("vm name verified");
 			} else {
 				return notFound("VM "+vmName+" not found.");
 			}
@@ -106,6 +108,8 @@ public class Application extends Controller {
 	public static Result createVM(String hostName){
 		Host tempHost;
 		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
 			tempHost = new Host(hostName);
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
@@ -123,7 +127,7 @@ public class Application extends Controller {
 		} else {
 			String vmName = json.findPath("vmName").textValue();
 			if(vmName == null) {
-				System.out.println("Expecting vmnam data");	
+				System.out.println("Expecting vmname data");	
 				return badRequest("Missing parameter [vmName]");
 			} else {
 				int vcpu = json.findPath("vcpu").intValue();
@@ -149,7 +153,7 @@ public class Application extends Controller {
 								
 								return badRequest("Cannot create vm");
 							}else {
-								return created();
+								return created("vm created");
 							}
 							
 						}
@@ -164,7 +168,7 @@ public class Application extends Controller {
 		Host tempHost;
 		try {
 			if(!Host.ishostExist(hostName))
-				return notFound();
+				return notFound("Host "+hostName+" not found.");
 			tempHost = new Host(hostName);
 			JsonNode js=tempHost.getHostInfo();
 			tempHost.close();
@@ -186,7 +190,7 @@ public class Application extends Controller {
 		Host tempHost;
 		try {
 			if(!Host.ishostExist(hostName))
-				return notFound();
+				return notFound("Host "+hostName+" not found.");
 			tempHost = new Host(hostName);
 			JsonNode js=tempHost.getRuntimeVMStatus();
 			tempHost.close();

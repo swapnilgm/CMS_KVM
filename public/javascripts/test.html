@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TEST</title>
+    <script src="circles.js"></script>
+</head>
+<body>
+<div id="circles-1" class="circles"></div>
+</body>
+<script>
+    var x = Math.round((Math.random() * 10) + 1);
+            console.log(x);
+            
+            Circles.create({
+            id: 'circles-1',
+            percentage: x,
+            radius: 20,
+            width: 7,
+            number: x,
+            text: '%',
+            colors: ['#aff', '#aaa'],
+            duration: null
+            });
+</script>
+</html>

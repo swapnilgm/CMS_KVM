@@ -107,13 +107,13 @@ public class VMStatus extends TimerTask {
 			rowcount = rs.getRow();
 			rs.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
 		}*/
-		BigDecimal[] cpu=new BigDecimal[30];
-		BigDecimal[] memory=new BigDecimal[30];
+		float[] cpu=new float[30];
+		float[] memory=new float[30];
 		String[] state=new String[30];
 		int index=0;
 		while (rs.next()) {
-			cpu[index]=rs.getBigDecimal("cpu");
-			memory[index]=rs.getBigDecimal("memory");
+			cpu[index]=rs.getBigDecimal("cpu").floatValue();
+			memory[index]=rs.getBigDecimal("memory").floatValue();
 			state[index]=rs.getString("state");
 			index++;
 		}
