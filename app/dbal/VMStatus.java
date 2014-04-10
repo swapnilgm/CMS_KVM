@@ -30,8 +30,8 @@ public class VMStatus extends TimerTask {
 		DomainInfo vmInfoSample1;
 		DomainInfo vmInfoSample2;
 		double percpu,permem;
-		long cpuTimeSample1;
-		long cpuTimeSample2;
+		long cpuTimeSample1,vmCPU1;
+		long cpuTimeSample2,vmCPU2;
 		long cpuTimeNodeDiff;
 		long cpuTImeVMdiff;
 		int cores;
@@ -55,8 +55,9 @@ public class VMStatus extends TimerTask {
 						//cores=tempHost.conn.nodeInfo().cores;
 						for( Domain vm : vmList) {
 							try {
-								vmInfoSample1 = vm.getInfo();
 								cpuTimeSample1=System.nanoTime();
+								vmInfoSample1 = vm.getInfo();
+								vmCPU1=vmInfoSample1.cpuTime;
 								try {
 									Thread.sleep(500);
 								} catch (InterruptedException e) {
@@ -65,9 +66,10 @@ public class VMStatus extends TimerTask {
 								}
 								cores=vm.getInfo().nrVirtCpu;
 								vmInfoSample2 = vm.getInfo();
+								vmCPU2=vmInfoSample2.cpuTime;
 								cpuTimeSample2=System.nanoTime();
 								cpuTimeNodeDiff=cpuTimeSample2-cpuTimeSample1;
-								cpuTImeVMdiff=vmInfoSample2.cpuTime-vmInfoSample1.cpuTime;
+								cpuTImeVMdiff=vmCPU2-vmCPU1;
 								percpu=(100*cpuTImeVMdiff)/(cpuTimeNodeDiff*cores);
 								permem = vmInfoSample2.memory*100/vmInfoSample2.maxMem;
 								inprepstmt.setString(1,vm.getUUIDString());
