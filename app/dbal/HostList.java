@@ -107,14 +107,14 @@ public class HostList extends TimerTask {
 								conn.close();
 								
 							}else {
-								if(found){
+								if(found && active){
 									//delete logically
 									stmt.executeUpdate("UPDATE Host set active = '0' WHERE hostIP = '"+hostIP+"'");
 									System.out.println("Host "+ hostIP +" down.");
 								}
 							}
 						}else {
-							if(found){ 
+							if(found && active){ 
 								//delete logically
 								stmt.executeUpdate("UPDATE Host SET active= '0' WHERE hostIP = '"+hostIP+"'");
 								System.out.println("Host "+hostIP+ " down.");

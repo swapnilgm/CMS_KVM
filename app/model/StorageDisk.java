@@ -122,13 +122,13 @@ public class StorageDisk {
 			//System.out.println(poolXML);
 			//xml parsing to get storage pool path
 			int startIndex=poolXML.indexOf("type='");
-			System.out.println("si="+startIndex);
+			//System.out.println("si="+startIndex);
 			//			<pool type='netfs'>
 			
 			int lastIndex=poolXML.indexOf("'>",startIndex+6);
-			System.out.println("li="+lastIndex);
+			//System.out.println("li="+lastIndex);
 			String path=poolXML.substring(startIndex+6, lastIndex);
-			System.out.println("path="+path);
+			//System.out.println("path="+path);
 			
 			//check type iscsi or netfs
 			if(path.compareToIgnoreCase("iscsi")==0)
@@ -165,8 +165,13 @@ public class StorageDisk {
     		stv=stp.storageVolLookupByName(stvName);
     		StorageVolInfo stvInfo=stv.getInfo();
     		//jso.put("Type", stvInfo.type.name()); unn
-    		jso.put("Capacity", stvInfo.capacity/1024/1024);
-    		jso.put("Allocation",stvInfo.allocation*100/stvInfo.capacity);
+    		long capacity=stvInfo.capacity;
+    		jso.put("Capacity", capacity/1024/1024);
+    		if(capacity==0){
+    			jso.put("Allocation",0);
+    		} else {
+    			jso.put("Allocation",stvInfo.allocation*100/capacity);
+    		}
     		stv.free();
     		jsolist.add(jso);
     	}

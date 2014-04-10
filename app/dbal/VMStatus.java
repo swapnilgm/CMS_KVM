@@ -52,7 +52,7 @@ public class VMStatus extends TimerTask {
 						tempHost=new Host(hostName);
 						vmList=tempHost.listVM(1);
 						
-						cores=tempHost.conn.nodeInfo().cores;
+						//cores=tempHost.conn.nodeInfo().cores;
 						for( Domain vm : vmList) {
 							try {
 								vmInfoSample1 = vm.getInfo();
@@ -62,7 +62,8 @@ public class VMStatus extends TimerTask {
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}								
+								}
+								cores=vm.getInfo().nrVirtCpu;
 								vmInfoSample2 = vm.getInfo();
 								cpuTimeSample2=System.nanoTime();
 								cpuTimeNodeDiff=cpuTimeSample2-cpuTimeSample1;

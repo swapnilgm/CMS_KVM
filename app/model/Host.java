@@ -65,10 +65,15 @@ public class Host {
 		
 	}
 	
-	public boolean validVMName(String vmName) throws LibvirtException {
-		if(this.conn.domainLookupByName(vmName)!=null){
-			return true;
-		}else {
+	public boolean validVMName(String vmName)  {
+		try {
+			if(this.conn.domainLookupByName(vmName)!=null){
+				return true;
+			}else {
+				return false;
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
 			return false;
 		}
 	}
@@ -343,9 +348,17 @@ public class Host {
 			capacity=stpInfo.capacity;
 			jso.put("Capacity",capacity/1024/1024);
 			temp=stpInfo.available;
-			jso.put("Available",temp*100/capacity);
+			if(capacity!=0) {
+				jso.put("Available",temp*100/capacity);
+			} else {
+				jso.put("Available",0);
+			}
 			temp=stpInfo.allocation;
-			jso.put("Allocation",temp*100/capacity);
+			if(capacity!=0) {
+				jso.put("Allocation",temp*100/capacity);
+			} else {
+				jso.put("Allocation",0);
+			}
 			jso.put("persistant",stp.isPersistent());
 			jso.put("noOfVol",stp.numOfVolumes());				
 			stp.free();
@@ -423,6 +436,7 @@ public class Host {
 				else
 					jso.put("Persistant","No");
 				jso.put("name",vm.getName());
+				vm.free();
 			} catch (LibvirtException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

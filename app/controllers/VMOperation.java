@@ -4,6 +4,9 @@ import java.sql.SQLException;
 
 import org.libvirt.LibvirtException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import play.libs.Json;
 import play.mvc.*;
 import model.Host;
 import model.VM;
@@ -43,15 +46,15 @@ public class VMOperation extends Controller{
 				return ok("started");
 			case -2: 
 				return badRequest("VM is already in active state.");
-				default: 
-					return badRequest("server error");
+			default: 
+				return badRequest("server error");
 				
 			}
 		} catch (LibvirtException e) {
 			System.out.println(e.getMessage());
-
+			
 			return internalServerError("Oops unable to send start signal");
-
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -95,8 +98,8 @@ public class VMOperation extends Controller{
 			}
 		} catch (LibvirtException e) {
 			System.out.println(e.getMessage());
-		return internalServerError("Oops unable to send shutdown signal");
-
+			return internalServerError("Oops unable to send shutdown signal");
+			
 		}catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -318,7 +321,7 @@ public class VMOperation extends Controller{
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}	
-	
+	/*
 	public static Result save(String vmName, String hostName) {
 		VM vm;
 		Host tempHost;
@@ -360,6 +363,50 @@ public class VMOperation extends Controller{
 			return internalServerError("Oops database server connectivity.");
 		}   
 	}     
+	 */
+	public static Result snapshotList(String vmName, String hostName){
+		VM vm;
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops database connection error");
+		} 
+		
+		try {
+			vm=new VM();
+			String [] snapList= vm.snapshotList(vmName, hostName);
+			if(snapList==null){
+				return notFound("no snapshots found.");
+			} else {
+				return ok(Json.toJson(snapList));
+			}
+			
+		} catch (LibvirtException e) {
+			System.out.println(e.getMessage());
+			
+			return internalServerError("Oops unable to create snapshot");
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops database server connectivity.");
+		}	
+		
+	}
 	
 	public static Result snapshot(String vmName, String hostName){
 		VM vm;
@@ -385,21 +432,30 @@ public class VMOperation extends Controller{
 		
 		try {
 			vm=new VM();
-			switch(vm.snapshot(hostName, vmName, request().body().asJson())){
-			case -1:
-				return notFound("No vm "+vmName+" found on host"+hostName+".");
-			case 0:
-				return ok("Opps snapshot can't be create");
-			case 1:
-				return ok("snapshot created");
-			default: 
-				return ok("ok");
+			JsonNode js = request().body().asJson();
+			String snapName = js.findPath("Name").textValue();
+			if(vmName == null) {
+				System.out.println("Expecting snapshot name data");	
+				return badRequest("Missing parameter [Name]");
+			} else {
+				switch(vm.snapshotCreate(hostName, vmName, js )){
+				case -2:
+					return found("Sanpshot  " +snapName+" already exist.");
+				case -1:
+					return notFound("No vm "+vmName+" found on host "+hostName+".");
+				case 0:
+					return ok("Opps snapshot can't be create");
+				case 1:
+					return ok("snapshot created");
+				default: 
+					return ok("ok");
+				}
 			}
 		} catch (LibvirtException e) {
 			System.out.println(e.getMessage());
-
+			
 			return internalServerError("Oops unable to create snapshot");
-
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -408,6 +464,51 @@ public class VMOperation extends Controller{
 		
 	}
 	
+	public static Result snapshotDelete(String vmName, String hostName, String snapshot) {
+		VM vm;
+		Host tempHost;
+		try {
+			if(!Host.ishostExist(hostName))
+				return notFound("Host "+hostName+" not found.");
+			tempHost = new Host(hostName);
+			if(tempHost.validVMName(vmName)){
+				tempHost.close();		
+			} else {
+				return notFound("VM "+vmName+" not found.");
+			}
+		} catch (LibvirtException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops libvirt error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops database connection error");
+		} 
+		
+		try {
+			vm=new VM();
+			switch(vm.snapshotDelete(vmName, hostName, snapshot)){
+			case -2:
+				return notFound("No snapshot "+snapshot+" found.");
+			case -1:
+				return notFound("No vm "+vmName+" found on host"+hostName+".");
+			case 1:
+				return ok("deleted");
+			case 0:
+				return internalServerError("Error while deleting snapshot");
+			default: 
+				return ok("ok");
+			}
+		} catch (LibvirtException e) {
+			System.out.println(e.getMessage());
+			return internalServerError("Oops unable to delete");
+		}catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return internalServerError("Oops database server connectivity.");
+		}   
+	}	
 	public static Result revert(String vmName, String hostName, String snapshot){
 		VM vm;
 		Host tempHost;
@@ -456,7 +557,7 @@ public class VMOperation extends Controller{
 		}   
 		
 	}
-
+	
 	public static Result attachStorage(String hostName, String vmName,  String poolName, String volName) {
 		Host tempHost;
 		try {

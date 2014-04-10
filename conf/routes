@@ -33,6 +33,12 @@ DELETE  /vm/delete		controllers.VMOperation.delete(vmName : String, hostName : S
 #attach device
 POST  /vm/addDisk		controllers.VMOperation.attachStorage(hostName : String, vmName : String,poolName : String,volName : String)
 
+#vm snapshots
+GET  /vm/snapshot/list		controllers.VMOperation.snapshotList(vmName : String, hostName : String)
+POST  /vm/snapshot/create		controllers.VMOperation.snapshot(vmName : String, hostName : String)
+PUT  /vm/snapshot/revert		controllers.VMOperation.revert(vmName : String, hostName : String , snapshotName : String)
+DELETE  /vm/snapshot/delete		controllers.VMOperation.snapshotDelete(vmName : String, hostName : String , snapshotName : String)
+
 #storage
 
 GET /storage/pool/list		controllers.Storage.listStoragePool(hostName : String, filter: Int)
@@ -50,6 +56,7 @@ GET	 /network/stop		controllers.Network.stopNW(netName : String, hostName : Stri
 GET	 /network/delete		controllers.Network.deleteNW(netName : String, hostName : String)
 GET	 /network			controllers.Network.listNW()
 POST	 /network/create		controllers.Network.createNW()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

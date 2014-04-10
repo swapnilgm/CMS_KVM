@@ -94,13 +94,13 @@ public class Application extends Controller {
 			} else {
 				return notFound("VM "+vmName+" not found.");
 			}
-		} catch (LibvirtException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}catch (LibvirtException e) {
+			
+			System.out.println(e.getMessage());
 			return internalServerError("Oops, Connection to Host is lost");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}  catch (SQLException e) {
+			
+			System.out.println(e.getMessage());
 			return internalServerError("Oops database connection error");
 		}       	
 	}        
@@ -130,15 +130,11 @@ public class Application extends Controller {
 				System.out.println("Expecting vmname data");	
 				return badRequest("Missing parameter [vmName]");
 			} else {
-				try {
-					if(tempHost.validVMName(vmName)){
-						return notFound("VM "+vmName+" already exist.");
-					}
-				} catch (LibvirtException e) {
-					// TODO Auto-generated catch block
-					System.out.println(e.getMessage());
-					return internalServerError("Oops unable to connect to host");
+				
+				if(tempHost.validVMName(vmName)){
+					return notFound("VM "+vmName+" already exist.");
 				}
+				
 				int vcpu = json.findPath("vcpu").intValue();
 				if(vcpu == 0) {
 					System.out.println("Expecting vcpu data");

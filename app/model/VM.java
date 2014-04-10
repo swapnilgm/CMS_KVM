@@ -1,25 +1,33 @@
 package model;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.libvirt.*;
+
+import play.libs.Json;
 
 import model.Host;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VM {
+	Host tempHost=null;
+	Domain vm=null;
 	
 	public int start(String vmName, String hostName) throws LibvirtException, SQLException {
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		 tempHost=new Host(hostName);
+		 vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
+		
 		if(vm==null){
 			return -1;		//notFound("No vm "+vmName+" found on host"+hostName+".");
 		}
 		if(vm.isActive()!=1)
 		{
 			if(vm.create()==0){
+				vm.free();
 				return 1;		//("started");
 			}
 			else {
@@ -27,17 +35,19 @@ public class VM {
 			}
 		}
 		else return -2;
+		
 	}
 	
 	public int shutdown(String vmName, String hostName) throws LibvirtException, SQLException {
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null){
 			return -1;		//notFound("No vm "+vmName+" found on host"+hostName+".");
 		}
 		if(vm.isActive()==1){
 			vm.shutdown();
+			vm.free();
 			return 1;		//("shutdown signal sent");
 		}
 		else return 0;		//("vm is not running.");       	
@@ -45,58 +55,62 @@ public class VM {
 
 	//for following op check for the flags
 	public int reboot(String vmName,String hostName) throws LibvirtException, SQLException {
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
 		if(vm.isActive()==1){
 			vm.reboot(0);
+			vm.free();
 			return 1;	//("rebooted");
 		}
 		else return 0;	//("vm is not running.");		
 	}
 	
 	public int destroy(String vmName, String hostName) throws LibvirtException, SQLException {
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");		
 		}
 		vm.destroy();
+		vm.free();
 		return 1;	//("destroyed");
 		
 	}        
 	
 	public int suspend(String vmName, String hostName) throws LibvirtException, SQLException{
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null)
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		if(vm.isActive()==1){
 			vm.suspend();
+			vm.free();
 			return 1;	//("suspended");
 		}
 		else return 0;	//("vm is not running.");
 	}
 	
 	public int resume(String vmName, String hostName) throws LibvirtException, SQLException{
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
 		}
-		vm.resume();				
+		vm.resume();
+		vm.free();
 		return 1;	//("resumed");
 	}
 	
 	public int delete(String vmName, String hostName) throws LibvirtException, SQLException {
-		Host tempHost=new Host(hostName);
-		Domain vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
 		tempHost.close();
 		if(vm==null){
 			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
@@ -104,9 +118,10 @@ public class VM {
 		if(vm.isActive()>0)
 			vm.destroy();
 		vm.undefine(3);
+		vm.free();
 		return 1;	//("deleted");
 	}
-	
+	/*
 	public int save(String vmName, String hostName) throws LibvirtException, SQLException {
 			String to=new String(); 
 			Host tempHost=new Host(hostName);
@@ -120,8 +135,42 @@ public class VM {
 			//Database  add memory state snapshot path
 			return	1;	//("saved");
 	}     
+	*/
+	public String [] snapshotList(String vmName, String hostName) throws LibvirtException, SQLException {
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
+		if(vm==null){
+			return null;	//("No vm "+vmName+" found on host"+hostName+".");
+		} else {
+			String [] snapList=vm.snapshotListNames();
+			vm.free();
+			return snapList;
+		}
+	}
+
+	public int snapshotDelete(String vmName, String hostName, String snapshot) throws LibvirtException, SQLException {
+		tempHost=new Host(hostName);
+		vm=tempHost.conn.domainLookupByName(vmName);
+		tempHost.close();
+		if(vm==null){
+			return -1;	//("No vm "+vmName+" found on host"+hostName+".");
+		} else {
+			DomainSnapshot ds=vm.snapshotLookupByName(snapshot);
+			if(ds==null) {
+				vm.free();
+				return -2;	//snapshot not found
+			} else {
+				int res=ds.delete(0);
+				vm.free();
+				if(res==0)
+					return 1;
+				else return 0;
+			}
+		}
+	}
 	
-	public int snapshot(String hostName,String vmName,JsonNode json) throws LibvirtException, SQLException{
+	public int snapshotCreate(String hostName,String vmName,JsonNode json) throws LibvirtException, SQLException{
 		String xmlDesc=new String("<domainsnapshot>");
 		String name = json.findPath("Name").textValue();
 		if(name != null) {
@@ -138,6 +187,13 @@ public class VM {
 		tempHost.close();
 		if(vm==null)
 			return -1;	//vm not found
+		try {
+			if(vm.snapshotLookupByName(name)!=null)
+				return -2;				//snapshot already exist
+		} catch (LibvirtException e) {
+			//ignore no snapshot found
+		}	
+			
 		DomainSnapshot vmSnap=vm.snapshotCreateXML(xmlDesc);
 		if(vmSnap!=null){
 			vmSnap.free();
